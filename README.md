@@ -40,12 +40,7 @@ Installing the [trackpy](https://github.com/soft-matter/trackpy) package:
 3. Switch to the cloned folder ``cd trackpy``
 4. Install trackpy into the environment ``python setup.py develop``
 
-Installing the [pims](https://github.com/soft-matter/pims) package:
 
-1. Leave the lbFCS directory ``cd ..``
-2. [Clone](https://help.github.com/en/articles/cloning-a-repository) the [pims](https://github.com/soft-matter/pims) repository
-3. Switch to the cloned folder ``cd pims``
-4. Install pims into the environment ``python setup.py develop``
 
 ## Usage
 
