@@ -1,0 +1,5 @@
+__pycache__/
+/picasso/__pycache__
+/spt/__pycache__
+.gitignore~
+
