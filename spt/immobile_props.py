@@ -1,9 +1,12 @@
+import os
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import sys
 import warnings
 warnings.filterwarnings("ignore")
+
+import picasso_addon.io as addon_io
 
 #%%
 def get_trace(df,NoFrames):
@@ -305,7 +308,7 @@ def filter_(df,NoFrames,apply_filter=None):
     '''
     if apply_filter=='fix':
         df_filter=filter_fix(df)
-    elif apply_filter=='nofix':
+    elif apply_filter=='paint':
         df_filter=filter_nofix(df,NoFrames)
     elif apply_filter==None:
         df_filter=df.copy()
@@ -314,3 +317,87 @@ def filter_(df,NoFrames,apply_filter=None):
         sys.exit()
     
     return df_filter
+
+
+#%%
+def main(locs,info,**params):
+    '''
+    Cluster detection (pick) in localization list by thresholding in number of localizations per cluster.
+    Cluster centers are determined by creating images of localization list with set oversampling.
+    
+    
+    args:
+        locs(pd.Dataframe):        Picked localizations as created by picasso render
+        info(list(dict)):          Info to picked localizations
+    
+    **kwargs: If not explicitly specified set to default, also when specified as None
+        ignore(int=1):             Ignore value for bright frame
+        parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)
+        NoPartitions(int=30):      Number of partitions in case of parallel computing
+        filter(string='paint'):    Which filter to use, either None, 'paint' or 'fix'
+    
+    return:
+        list[0](dict):             Dict of **kwargs passed to function.
+        list[1](pandas.DataFrame): Kinetic properties of all groups.
+                                   Will be saved with extension '_picked_tprops.hdf5' for usage in picasso.filter
+    '''
+    
+    ### Set standard conditions if not set as input
+    standard_params={'ignore':1,
+                     'parallel':True,
+                     'NoPartitions':30,
+                     'filter':'paint'
+                     }
+    ### Remove keys in params that are not needed
+    for key, value in standard_params.items():
+        try:
+            params[key]
+            if params[key]==None: params[key]=standard_params[key]
+        except:
+            params[key]=standard_params[key]
+    ### Remove keys in params that are not needed
+    delete_key=[]
+    for key, value in params.items():
+        if key not in standard_params.keys():
+            delete_key.extend([key])
+    for key in delete_key:
+        del params[key]
+        
+    ### Procsessing marks: extension&generatedby
+    try: extension=info[-1]['extension']+'_tprops'
+    except: extension='_locs_xxx_picked_tprops'
+    params['extension']=extension
+    params['generatedby']='spt.immobile_props.main()'
+    
+    ### Get path of and number of frames
+    path=info[0]['File']
+    path=os.path.splitext(path)[0]
+    NoFrames=info[0]['Frames']
+    
+    ### Calculate kinetic properties
+    print('Calculating kinetic information ...')
+    if params['parallel']==True:
+        print('... in parallel')
+        locs_props=apply_props_dask(locs,
+                                    ignore=params['ignore'],
+                                    NoPartitions=params['NoPartitions'],
+                                    )
+    else:
+        locs_props=apply_props(locs,
+                                    ignore=params['ignore'],
+                                    )
+    ### Filtering
+    print('Filtering ..(%s)'%(params['filter']))
+    params['NoGroups_nofilter']=len(locs_props) # Number of groups before filter
+    locs_props=filter_(locs_props,NoFrames,params['filter']) # Apply filter
+    params['NoGroups_filter']=len(locs_props) # Number of groups after filter
+
+
+    print('Saving _tprops ...')
+    info_props=info.copy()+[params]
+    addon_io.save_locs(path+extension+'.hdf5',
+                       locs_props,
+                       info_props,
+                       mode='picasso_compatible')
+
+    return [params,locs_props]

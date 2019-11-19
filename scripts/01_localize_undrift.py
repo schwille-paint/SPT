@@ -1,4 +1,4 @@
-#Script to call localize and undrift by RCC
+#Script to call picasso_addon.localize.main()
 import os
 import importlib
 import matplotlib.pyplot as plt

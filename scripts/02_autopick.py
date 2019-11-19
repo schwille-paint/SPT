@@ -1,4 +1,4 @@
-#Script to call autopick main function
+#Script to call picass_addon.autopick main()
 import os
 import importlib
 import matplotlib.pyplot as plt
@@ -11,10 +11,10 @@ importlib.reload(autopick)
 
 ############################################# Load raw data
 dir_names=[]
-dir_names.extend(['directory to _locs.hdf5 file'])
+dir_names.extend(['directory to locs_render file'])
 
 file_names=[]
-file_names.extend(['file name'])
+file_names.extend(['file_name'])
 
 ############################################ Set non standard parameters 
 ### Valid for all evaluations

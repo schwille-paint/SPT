@@ -52,6 +52,9 @@ Installing the [trackpy](https://github.com/soft-matter/trackpy) package:
     * */scripts/02_autopick.py* invokes ``picasso_addon.autopick.main(``) function
     * ``import picasso_addon.autopick as autopick`` and ``help(autopick.main)`` to see full list of parameters
 3. Kinetic properties (immobile paricles)
+    * Kinetic analysis of immobilized particles based on _picked file of autopick
+    * */scripts/03_immob_props.py* invokes ``spt.immobile_props.main(``) function
+    * ``import spt.immobile_props as improps`` and ``help(improps.main)`` to see full list of parameters
 4. Kinetic properties (mobile particles)
 
 ### Remarks
