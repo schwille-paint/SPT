@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import sys
+import warnings
+warnings.filterwarnings("ignore")
 
 #%%
 def get_trace(df,NoFrames):
@@ -18,10 +20,14 @@ def get_trace(df,NoFrames):
 #%%
 def get_taubs(df,ignore=1):
     '''
-    Return sorted array of bright times in trace for group.
+    Return array of bright times and corresponding 1st frame of each bright event of for trace of a group.
     '''
-    frames=df['frame'].values # Get sorted frames as numpy.ndarray
-    frames.sort()
+    locs_trace=df.loc[:,['frame','photons']].sort_values(by=['frame']) # Get subset of df sort by frame
+    ### Get ...
+    frames=locs_trace.frame.values # ... frame number per localization
+    photons=locs_trace.photons.values # ... photon number per localization
+    locs_idx=np.arange(0,len(frames),1).astype(int) # ... and index per localization
+    
     dframes=frames[1:]-frames[0:-1] # Get frame distances i.e. dark times
     dframes=dframes.astype(float) # Convert to float values for later multiplications
     
@@ -30,39 +36,89 @@ def get_taubs(df,ignore=1):
     dframes[dframes>1]=1 # Set dark frames to 1
     dframes[dframes<1]=np.nan # Set bright frames to NaN
     
-    mask_end=np.concatenate([dframes,[1]],axis=0) # Mask for end of events, add 1 at end
-    frames_end=frames*mask_end # Apply mask to frames to get end frames of events
-    frames_end=frames_end[~np.isnan(frames_end)] # get only non-NaN values, removal of bright frames
-    
+    ### Get 1st frame and index in locs of bright events
     mask_start=np.concatenate([[1],dframes],axis=0) # Mask for start of events, add one at start
     frames_start=frames*mask_start # Apply mask to frames to get start frames events
+    locs_idx_start=locs_idx*mask_start
+    locs_idx_start=locs_idx_start[~np.isnan(frames_start)] # Start index in locs coordinates
     frames_start=frames_start[~np.isnan(frames_start)] # get only non-NaN values, removal of bright frames
+    
+    ### Get last frame and index in locs of bright events
+    mask_end=np.concatenate([dframes,[1]],axis=0) # Mask for end of events, add 1 at end
+    frames_end=frames*mask_end # Apply mask to frames to get end frames of events
+    locs_idx_end=locs_idx*mask_end
+    locs_idx_end=locs_idx_end[~np.isnan(frames_end)]+1 # End index in locs coordinates
+    frames_end=frames_end[~np.isnan(frames_end)].astype(int) # get only non-NaN values, removal of bright frames
     
     taubs=frames_end-frames_start+1 # get tau_b distribution
     
-    return taubs
+    ### Convert to integers
+    taubs=taubs.astype(int)
+    frames_start=frames_start.astype(int)
+    locs_idx_end=locs_idx_end.astype(int)
+    locs_idx_start=locs_idx_start.astype(int)
+    
+    ### Get photon values per taub
+    taubs_photons=np.zeros(len(taubs)) #Init
+    taubs_photons_err=np.zeros(len(taubs)) #Init
+    for idx,start in enumerate(locs_idx_start):
+        taubs_photons[idx]=np.mean(photons[start:locs_idx_end[idx]])
+        taubs_photons_err[idx]=np.std(photons[start:locs_idx_end[idx]])
+        taubs_photons_err[idx]=taubs_photons_err[idx]/taubs_photons[idx] # Relative error!
+        
+    return taubs,frames_start,taubs_photons,taubs_photons_err
 
 #%%
-def taubs_to_NgT(taubs,Ts):
+def taubs_to_NgT(taubs,
+                 start_frames,
+                 taubs_photons,
+                 taubs_photons_err,
+                 Ts):
     '''
     Return number of bright times greater than Ts as array of len(Ts).
     '''
     NgT=np.zeros(len(Ts))
+    NgT_start=np.zeros(len(Ts))
+    NgT_photons=np.zeros(len(Ts))
+    NgT_photons_err=np.zeros(len(Ts))
+    
     for idx,T in enumerate(Ts):
-        NgT[idx]=np.sum(taubs>=T)
-    
+        positives=taubs>=T # Which bright events are longer than T? -> positives
+            
+        NgT[idx]=np.sum(positives) # How many positives
+        NgT_start[idx]=np.mean(start_frames[positives]) # When did positives start?
+        NgT_photons[idx]=np.mean(taubs_photons[positives]) # How bright were positives on average?
+        NgT_photons_err[idx]=np.mean(taubs_photons_err[positives]) # How much scatter positives in brightness on average?
+        
+    ### Prepare output
     NgT=pd.Series(NgT)
-    NgT.index=Ts
+    NgT.index=['n%i'%(T) for T in Ts]
     
-    return NgT
+    NgT_start=pd.Series(NgT_start)
+    NgT_start.index=['s%i'%(T) for T in Ts]
+    
+    NgT_photons=pd.Series(NgT_photons)
+    NgT_photons.index=['p%i'%(T) for T in Ts]
+    
+    NgT_photons_err=pd.Series(NgT_photons_err)
+    NgT_photons_err.index=['e%i'%(T) for T in Ts]
+    
+    s_out=pd.concat([NgT,NgT_start,NgT_photons,NgT_photons_err])
+    
+    return s_out
 
 #%%
 def get_NgT(df,Ts,ignore=1):
     '''
     Combine get_taubs and taubs_to_NgT to return NgT as pd.Series.
     '''
-    taubs=get_taubs(df,ignore)
-    NgT=taubs_to_NgT(taubs,Ts)
+    
+    taubs,start_frames,taubs_photons,taubs_photons_err=get_taubs(df,ignore)
+    NgT=taubs_to_NgT(taubs,
+                     start_frames,
+                     taubs_photons,
+                     taubs_photons_err,
+                     Ts)
     
     return NgT
     
@@ -76,7 +132,7 @@ def get_start(df,ignore):
     s_out = pd.Series({'min_frame':min_frame}) # Assign to output
 
     for i in ignore:
-        taubs=get_taubs(df,ignore=i) # Get taub distribution
+        taubs=get_taubs(df,ignore=i)[0] # Get taub distribution
         if min_frame<=i:
             try:    
                 Tstart = taubs[0]+min_frame

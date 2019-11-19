@@ -48,30 +48,68 @@ def get_half_time(df):
 #%%
 def get_NgT(df):
     '''
-    Return average and standard deviation of number of trajectories per particle longer or equal than T.
+    Return average and 25%/75% interquartile range of all NgT related values.
     '''
     fields=df.columns.values[17:]
-    NgT_mean=df.loc[:,fields].mean()
+    NgT_mean=df.loc[:,fields].mean(axis=0)
     NgT_std=df.loc[:,fields].std()
-    NgT=pd.DataFrame({'avg':NgT_mean,'err':NgT_std})
-    NgT.index=NgT.index.values.astype(float)
-    return NgT
+    NgT_iqr50=df.loc[:,fields].quantile(0.50,axis=0)
+    NgT_iqr25=df.loc[:,fields].quantile(0.25,axis=0)
+    NgT_iqr75=df.loc[:,fields].quantile(0.75,axis=0)
+    
+    NgT_stats=pd.DataFrame({'mean':NgT_mean,
+                      'std':NgT_std,
+                      '50%':NgT_iqr50,
+                      '25%':NgT_iqr25,
+                      '75%':NgT_iqr75})
+    
+    Ts=NgT_stats.index.values[17:]
+    Ts=np.array([int(T[1:]) for T in Ts])
+    Ts=np.unique(Ts)
+    
+    return NgT_stats,Ts
 
 #%%
 def get_T_with_N(df):
     '''
     Return critical times of NgT
     '''
-    N=get_NgT(df).avg # Get NgT
-    Ncrit=[0.5,1,2,5,10,20,50,100,1000] # Define critical points
-    s_out=pd.Series(index=[n for n in Ncrit]) # Init output
+    ### Define critical number of trajectories per particle
+    Ncrit=[0.5,1,2,5,10,50,100]
+    ### Get statistics of NgT
+    NgT_stats,Ts=get_NgT(df)
+   
+    ### Numbers, rip of n in index
+    idx=['n%i'%(T) for T in Ts]
+    N=NgT_stats.loc[idx,'mean']
+    N.index=Ts
+    ### Starts, rip of n in index
+    idx=['s%i'%(T) for T in Ts]
+    S=NgT_stats.loc[idx,'50%']
+    S.index=Ts
+    ### Photons, rip of n in index
+    idx=['p%i'%(T) for T in Ts]
+    P=NgT_stats.loc[idx,'50%']
+    P.index=Ts
+    
+    df_out=pd.DataFrame(index=[n for n in Ncrit],columns=['T','S']) # Init output
     for n in Ncrit:
         try:
-            s_out[n]=N[N>=n].index.values[-1]
+            df_out.loc[n,'T']=N[N>=n].index.values[-1]
+            df_out.loc[n,'S']=S[df_out.loc[n,'T']]
+            df_out.loc[n,'P']=P[df_out.loc[n,'T']]
         except IndexError:
-            s_out[n]=0
+            df_out.loc[n,'T']=0
             
-    s_out.index=['Tn%.0e'%(n) for n in Ncrit] # Rename index
+    ### Convert to Series
+    s_T=df_out.loc[:,'T']
+    s_T.index=['Tn=%.0e'%(n) for n in Ncrit]
+    s_S=df_out.loc[:,'S']
+    s_S.index=['Sn=%.0e'%(n) for n in Ncrit]
+    s_P=df_out.loc[:,'P']
+    s_P.index=['Pn=%.0e'%(n) for n in Ncrit]
+    
+    s_out=pd.concat([s_T,s_S,s_P])
     
     return s_out
 #%%
@@ -94,7 +132,7 @@ def get_result(df,name):
     
     fields=name.split('_')
     df_result=df_result.assign(dye=fields[0],
-                               spacer=fields[1],
+                               sample=fields[1],
                                buffer=fields[2],
                                exp=int(fields[3][3:]),
                                power=int(fields[4][1:-2]),

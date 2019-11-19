@@ -2,25 +2,26 @@ import os
 import importlib
 
 #### Load own packages
-import lbfcs.io
+import picasso_addon.io as io
 import spt.trackprops as props
 importlib.reload(props)
 #%%
 ### Define  paramters
 ignore = 1
 
-#apply_filter = 'fix'
-apply_filter = 'nofix'
+apply_filter = 'fix'
+#apply_filter = 'nofix'
 #apply_filter = None
 
 savename_ext='_tprops' # File extension for processed file
 ############################################################## Define data
-#### Path to locs_picked.hdf5
 dir_names=[]
-dir_names.extend(['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-11-07_th_p-exp-scan_PEG3k20%/id169_R1-54#_R1s1-8_20nM_exp100_p114uW_1/19-11-07_FS'])
+dir_names.extend(['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-11-05_p-exp-scan/id163_exp200_p038uW_1/19-11-15_JS']*3)
 
 file_names=[]
-file_names.extend(['id169_R1-54#_R1s1-8_20nM_exp100_p114uW_1_MMStack_Pos0.ome_locs_filter_render_picked_reset.hdf5'])
+file_names.extend(['id163_exp200_p038uW_1_MMStack_Pos0.ome_locs_picked.hdf5'])
+file_names.extend(['id163_exp200_p038uW_1_MMStack_Pos1.ome_locs_picked.hdf5'])
+file_names.extend(['id163_exp200_p038uW_1_MMStack_Pos2.ome_locs_picked.hdf5'])
                    
 #%%
 ############################################################# Read locs, apply props & save locs
@@ -31,7 +32,7 @@ path=[os.path.join(dir_names[i],file_names[i]) for i in range(0,len(file_names))
 for i in range(0,len(path)):
     #### File read in
     print('File read in ...')
-    locs,locs_info=lbfcs.io.load_locs(path[i])
+    locs,locs_info=io.load_locs(path[i])
     
     #### Get number of frames
     NoFrames=locs_info[0]['Frames']
@@ -54,9 +55,9 @@ for i in range(0,len(path)):
                 '# of picks before filter':groups_nofilter,
                 '# of picks after filter':groups_filter,        
                 }
-    
+
     print('File saving ...')
-    lbfcs.io.save_locs(path[i].replace('.hdf5',savename_ext+'.hdf5'),
+    io.save_locs(path[i].replace('.hdf5',savename_ext+'.hdf5'),
                            locs_props,
                            [locs_info,props_info],
                            mode='picasso_compatible')
