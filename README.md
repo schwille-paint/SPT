@@ -29,13 +29,13 @@ Installing the [picasso](https://github.com/jungmannlab/picasso) package:
 Installing the [lbFCS](https://github.com/schwille-paint/lbFCS) package:
 
 1. Leave the picasso directory ``cd ..``
-2. [Clone](https://help.github.com/en/articles/cloning-a-repository) the [lbFCS](https://github.com/schwille-paint/lbFCS) repository
-3. Switch to the cloned folder ``cd lbFCS``
-4. Install lbFCS into the environment ``python setup.py install``
+2. [Clone](https://help.github.com/en/articles/cloning-a-repository) the [picasso_addon](https://github.com/schwille-paint/picasso_addon) repository
+3. Switch to the cloned folder ``cd picasso_addon``
+4. Install picasso_addon into the environment ``python setup.py install``
 
 Installing the [trackpy](https://github.com/soft-matter/trackpy) package:
 
-1. Leave the lbFCS directory ``cd ..``
+1. Leave the picasso_addon directory ``cd ..``
 2. [Clone](https://help.github.com/en/articles/cloning-a-repository) the [trackpy](https://github.com/soft-matter/trackpy) repository
 3. Switch to the cloned folder ``cd trackpy``
 4. Install trackpy into the environment ``python setup.py develop``
@@ -43,6 +43,12 @@ Installing the [trackpy](https://github.com/soft-matter/trackpy) package:
 
 
 ## Usage
+1. Localize and undrift
+    * */scripts/01_localize_undrift.py* invokes ``picasso_addon.localize.main(``) function
+    * ``import picasso_addon.localize as localize`` and ``help(localize.main)`` to see full list of parameters
+2. Autopick
+3. Kinetic properties (immobile paricles)
+4. Kinetic properties (mobile particles)
 
 ### Remarks
 
