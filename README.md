@@ -26,7 +26,7 @@ Installing the [picasso](https://github.com/jungmannlab/picasso) package:
 2. Switch to the cloned folder ``cd picasso``
 3. Install picasso into the environment ``python setup.py install``
 
-Installing the [lbFCS](https://github.com/schwille-paint/lbFCS) package:
+Installing the [picasso_addon](https://github.com/schwille-paint/picasso_addon) package:
 
 1. Leave the picasso directory ``cd ..``
 2. [Clone](https://help.github.com/en/articles/cloning-a-repository) the [picasso_addon](https://github.com/schwille-paint/picasso_addon) repository
@@ -44,9 +44,13 @@ Installing the [trackpy](https://github.com/soft-matter/trackpy) package:
 
 ## Usage
 1. Localize and undrift
+    * Localize raw movie and undrift by image correlation
     * */scripts/01_localize_undrift.py* invokes ``picasso_addon.localize.main(``) function
     * ``import picasso_addon.localize as localize`` and ``help(localize.main)`` to see full list of parameters
 2. Autopick
+    * Define clusters in localization list for further kinetic analysis
+    * */scripts/02_autopick.py* invokes ``picasso_addon.autopick.main(``) function
+    * ``import picasso_addon.autopick as autopick`` and ``help(autopick.main)`` to see full list of parameters
 3. Kinetic properties (immobile paricles)
 4. Kinetic properties (mobile particles)
 
