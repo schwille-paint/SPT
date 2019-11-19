@@ -30,11 +30,11 @@ for i in range(0,len(file_names)):
     for key, value in params_special.items():
         params[key]=value[i]
     ### Run main function
-#    try:
-    locs,info=addon_io.load_locs(path)
-    out=improps.main(locs,info,**params)
-#    except:
-#        failed_path.extend([path])
+    try:
+        locs,info=addon_io.load_locs(path)
+        out=improps.main(locs,info,**params)
+    except:
+        failed_path.extend([path])
 
 print()    
 print('Failed attempts: %i'%(len(failed_path)))
