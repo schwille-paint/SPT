@@ -5,3 +5,4 @@ __pycache__/
 /dist
 .gitignore~
 /.ipynb_checkpoints
+/scripts
