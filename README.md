@@ -13,7 +13,7 @@ Custom module containing all relevant software for assessing the tracking perfor
 ## Installation
 
 Setting up the conda environment:
-1. Create a [conda][conda] environment ``conda create --name SPT python=3.7``
+1. Create a [conda](https://www.anaconda.com/distribution/) environment ``conda create --name SPT python=3.7``
 2. Activate the environment ``conda activate SPT``
 3. Install necessary packages 
     * ``conda install h5py matplotlib numba numpy scipy pyqt pyyaml scikit-learn colorama tqdm=4.36.1 spyder pandas dask spyder fastparquet pytables jupyterlab``
