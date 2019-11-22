@@ -1,24 +1,24 @@
 import os
-import pims
+import pandas as pd
 import importlib
 
 #### Load own packages
-import var_io as io
-import SPtracking.analyze as track
+import picasso.io as io
+import spt.trackpy_wrap as track
 importlib.reload(track)
 ############################################################## Define data
 #### Path to locs.hdf5
 locs_dir=['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-03-01_Cholesterol-diffusion/id56-500_Pm2-40nM_exp-30ms_B+_50mM-MgCl2+POC_p250uW_4/19-03-02_JB']
 locs_name=['id56-500_Pm2-40nM_exp-30ms_B+_50mM-MgCl2+POC_p250uW_4_MMStack_Pos0.ome_locs.hdf5']
 #### Path to tiff stack
-movie_dir=['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-03-01_Cholesterol-diffusion/id56-500_Pm2-40nM_exp-30ms_B+_50mM-MgCl2+POC_p250uW_4']
-movie_name=['id56-500_Pm2-40nM_exp-30ms_B+_50mM-MgCl2+POC_p250uW_4_MMStack_Pos0.ome.tif']
+movie_dir=['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-11-21_th_slb_origami-density-checks/s1_th_slb_ex200_p038uW_1']
+movie_name=['s1_th_slb_ex200_p038uW_1_MMStack_Pos0.ome.tif']
 
 ############################################################## Read in data
 #### Read in locs
-locs=io.read_locs(os.path.join(locs_dir[0],locs_name[0]))[0]
+locs=io.load_locs(os.path.join(locs_dir[0],locs_name[0]))[0]
 ### Read in movie
-movie=pims.open(os.path.join(movie_dir[0],movie_name[0]))
+movie=io.load_movie(os.path.join(movie_dir[0],movie_name[0]))[0]
 
 #%%
 ############################################################## Annotate & Filter 
