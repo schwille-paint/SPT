@@ -1,6 +1,7 @@
 __pycache__/
 /spt/__pycache__
 /spt.egg-info
+/SPT.egg-info
 /build
 /dist
 .gitignore~
