@@ -1,3 +1,12 @@
+#### Import modules
+import numpy as np
+import pandas as pd
+from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
+import trackpy as tp
+import os
+
+#%%
 def annotate_filter(locs,movie,frame,photon_hp=0):
     '''
     1) Plots frame of movie with annotated locs with photon values>photon_hp. Median proximity in frame indicated.
@@ -17,9 +26,6 @@ def annotate_filter(locs,movie,frame,photon_hp=0):
     locs_filter:pandas.Dataframe
         locs that survieved photon high pass
     '''
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import trackpy as tp
     
     #### Plot photons
     f=plt.figure(num=10,figsize=[4,3])
@@ -60,7 +66,6 @@ def get_link(locs,search_range,memory):
     '''
     
     '''
-    import trackpy as tp
       
     #### Link locs
     link= tp.link_df(locs,search_range,memory=memory)
@@ -88,11 +93,6 @@ def get_linkprops_noMSD(link,locs_info,length_hp):
     link_props : pandas.DataFrame
     '''
     
-    import pandas as pd
-    import numpy as np
-    
-
-    
     #### Get some properties
     print('Calculating means and lengths...')
     link_props=link.groupby('particle').mean()
@@ -115,18 +115,34 @@ def get_linkprops_noMSD(link,locs_info,length_hp):
      
     return link_props
 
+#%%
+def get_numtracks(link_props,frames):
+    '''
+    
+    '''
+    
+    #### Initialize variables: iterable over all frames and numTrack set to 0 in each frame
+    numTracks = pd.Series(np.zeros(len(frames)))
+    
+    print('Calculating number of tracks per frame...')
+    for current_frame in frames:
+        
+        #### Compute sum of 'active' trajectories satisfying: min_frame <= current_frame <= max_frame
+        larger_minFrame=link_props['min_frame']<=current_frame
+        smaller_maxFrame=link_props['max_frame']>=current_frame
+        istrue = larger_minFrame == smaller_maxFrame
+        
+        #### Store sum in numTracks
+        numTracks[current_frame] = istrue.sum()
+    
+    return numTracks
+
 
 #%%
 def get_numtracks_fit(link_props,locs_info,saveplot=True):
     
-    #### Import modules
-    import numpy as np
-    import pandas as pd
-    from scipy.optimize import curve_fit
-    import matplotlib.pyplot as plt
-    
     #### Calculate number of tracks per frame
-    NoFrames=link_props['props','max_frame'].max()+1 # get total number of rames
+    NoFrames=link_props['max_frame'].max()+1 # get total number of rames
     frames=range(0,NoFrames) 
     numtracks=get_numtracks(link_props,frames) # get number of tracks per frame
     
@@ -167,14 +183,13 @@ def get_numtracks_fit(link_props,locs_info,saveplot=True):
     s_out['c']=s_out_init*popt[2]
     s_out.set_index(link_props.index,inplace=True)
     
-    return s_out   
+    return s_out    
 
 #%%
 def scan_sr_mem(locs,locs_info,locs_dir,sr,mem,length_hp,downsize='crop',save_scan=True):
     '''
     
     '''
-    import os
     
     #### Downsize image stack either via cropping or time segmentation    
     #### for faster parameter scan
@@ -196,9 +211,9 @@ def scan_sr_mem(locs,locs_info,locs_dir,sr,mem,length_hp,downsize='crop',save_sc
     for s in sr:
         for m in mem:
             #### Link localizations via trackpy
-            link=track.get_link(locs,s,m)
+            link=get_link(locs,s,m)
             #### Get link_props without MSD calculation and fitting
-            link_props=track.get_linkprops_noMSD(link,locs_info,length_hp)
+            link_props=get_linkprops_noMSD(link,locs_info,length_hp)
             #### Optional saving of scan results in directory
             if save_scan:
                 savename='scan_sr%i_mem%i_len-hp%i_%s.h5'%(s,m,length_hp,downsize)
@@ -211,7 +226,7 @@ def scan_sr_mem(locs,locs_info,locs_dir,sr,mem,length_hp,downsize='crop',save_sc
                                   'sr':s,'mem':m},index=[('sr','mem')])
             df_out=pd.concat([df_out,df_temp])
     #### Plot results
-    plot_scan_results(scan_results)
+    plot_scan_results(df_out)
            
     return df_out
 
@@ -219,7 +234,6 @@ def scan_sr_mem(locs,locs_info,locs_dir,sr,mem,length_hp,downsize='crop',save_sc
 def plot_scan_results(df):
     '''
     '''
-    import matplotlib.pyplot as plt
     
     f=plt.figure(num=20,figsize=[5,3])
     f.subplots_adjust(left=0.15,right=0.84,bottom=0.17,top=0.83)
@@ -266,12 +280,7 @@ def get_linkprops(link,locs_info,length_hp=100,max_lagtime=200):
     -------
     link_props : pandas.DataFrame
     '''
-    import trackpy as tp
-    import pandas as pd
-    import numpy as np
-    
-
-    
+   
     #### Get some properties
     print('Calculating means and lengths...')
     link_props=link.groupby('particle').mean()
@@ -321,10 +330,6 @@ def fit_logiMSD(msd,plot=False):
             
         -> log(msd)=log(A)+n*log(t)
     '''
-    from scipy.optimize import curve_fit as curve_fit
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import pandas as pd
     
     #### Absolute error of logarithmic msd
     def abs_err_logmsd(msd):
@@ -389,11 +394,7 @@ def fit_iMSD_free(msd,p,plot=False):
     '''
 
     '''
-    from scipy.optimize import curve_fit as curve_fit
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import pandas as pd
-        
+
     #### Fit function
     def fitfunc(tau,a,b):
         msd=a+b*tau
@@ -439,7 +440,6 @@ def fit_iMSD_free_iterate(msd,max_it=5,plot=False):
     '''
     
     '''
-    import numpy as np
     
     #### Drop NaN
     msd.dropna(inplace=True)
@@ -467,32 +467,6 @@ def fit_iMSD_free_iterate(msd,max_it=5,plot=False):
             break
         i+=1
         
-    
     return s_out
 
-#%% 
-def get_numtracks(link_props,frames):
-    '''
-    
-    '''
-    import numpy as np
-    import pandas as pd
-    
-    #### Initialize variables: iterable over all frames and numTrack set to 0 in each frame
-    numTracks = pd.Series(np.zeros(len(frames)))
-    
-    print('Calculating number of tracks per frame...')
-    for current_frame in frames:
-        
-        #### Compute sum of 'active' trajectories satisfying: min_frame <= current_frame <= max_frame
-        larger_minFrame=link_props['min_frame']<=current_frame
-        smaller_maxFrame=link_props['max_frame']>=current_frame
-        istrue = larger_minFrame == smaller_maxFrame
-        
-        #### Store sum in numTracks
-        numTracks[current_frame] = istrue.sum()
-    
-    return numTracks
-
-#%%
-def main()    
+ 
