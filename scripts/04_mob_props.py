@@ -14,16 +14,17 @@ importlib.reload(analyze)
 #%%
 ######################################## Define data
 #### Path to locs.hdf5
-locs_dir=['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-11-21_th_slb_origami-density-checks/s3_th_slb_ex200_p038uW_1/19-11-25_JS']
-locs_name=['s3_th_slb_ex200_p038uW_1_MMStack_Pos0.ome_locs.hdf5']
+locs_dir=['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-12-04_SLB_fix_and_th/140_wash_slb_B_exp200_p038uW_2_nd_1/19-12-05_JS']
+locs_name=['140_wash_slb_B_exp200_p038uW_2_nd_1_MMStack_Pos1.ome_locs.hdf5']
 #### Path to tiff stack
-movie_dir=['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-11-21_th_slb_origami-density-checks/s3_th_slb_ex200_p038uW_1']
-movie_name=['s3_th_slb_ex200_p038uW_1_MMStack_Pos0.ome.tif']
+movie_dir=['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-12-04_SLB_fix_and_th/140_wash_slb_B_exp200_p038uW_2_nd_1']
+movie_name=['140_wash_slb_B_exp200_p038uW_2_nd_1_MMStack_Pos1.ome.tif']
 
 ######################################## Read in data
 #### Read in locs as DataFrame
 locs,locs_info=io.load_locs(os.path.join(locs_dir[0],locs_name[0]))
 locs=pd.DataFrame(locs)
+
 #### Read in movie
 movie=io.load_movie(os.path.join(movie_dir[0],movie_name[0]))[0]
 #%%
@@ -34,10 +35,10 @@ locs=track.annotate_filter(locs,movie,frame)
 
 #%%
 ######################################## Parameter scan for trackpy
-param_scan=False
+param_scan=True
 #### Define link parameters for scanning optimal search range    
 if param_scan==True:
-    search_range=[1,2,3,5]
+    search_range=[1,2,3,5,7,9]
     memory=[1,2]
     length_hp = 20
     #### Get scan results    

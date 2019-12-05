@@ -1,4 +1,3 @@
-#### Import modules
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
@@ -6,7 +5,8 @@ import matplotlib.pyplot as plt
 import trackpy as tp
 import os
 plt.style.use('~/lbFCS/styles/paper.mplstyle')
-
+# own modules
+import picasso.io as io
 
 #%%
 def annotate_filter(locs,movie,frame,photon_hp=0):
@@ -64,15 +64,56 @@ def annotate_filter(locs,movie,frame,photon_hp=0):
     return locs_filter
 
 #%%
-def get_link(locs,search_range,memory):
+def get_link(locs,locs_info,save_picked=False,**params):
     '''
     
     '''
-      
+    ### Set standard conditions if not set as input
+    search_range=2
+    memory=1
+    
+    standard_params={'search_range':search_range,
+                     'memory':memory,
+                     'save_picked':False
+                     }
+    ### Procsessing marks: extension&generatedby
+    try: extension=locs_info[-1]['extension']+'_picked'
+    except: extension='_locs_xxx_picked'
+    params['extension']=extension
+    params['generatedby']='spt.trackpy_wrap.get_link()'
+
+    ### Remove keys in params that are not needed
+    for key, value in standard_params.items():
+        try:
+            params[key]
+            if params[key]==None: params[key]=standard_params[key]
+        except:
+            params[key]=standard_params[key]
+    ### Remove keys in params that are not needed
+    delete_key=[]
+    for key, value in params.items():
+        if key not in standard_params.keys():
+            delete_key.extend([key])
+    for key in delete_key:
+        del params[key]
+    
+    ### Get path of raw data      
+    path=locs_info[0]['File']
+    path=os.path.splitext(path)[0]
+        
     #### Link locs
     link= tp.link_df(locs,search_range,memory=memory)
     link.sort_values(by=['particle','frame'],ascending=True,inplace=True)
     link.set_index('particle', inplace=True)
+    
+    #### Save linked locs as picks    
+    if save_picked==True:
+        
+        info_picked=locs_info.copy()+[params]
+        io.save_locs(path+extension+'.hdf5',
+                     link.to_records(index=False),
+                     info_picked,
+                     )
     
     return link
 
