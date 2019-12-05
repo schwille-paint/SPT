@@ -5,6 +5,8 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import trackpy as tp
 import os
+plt.style.use('~/lbFCS/styles/paper.mplstyle')
+
 
 #%%
 def annotate_filter(locs,movie,frame,photon_hp=0):
@@ -235,7 +237,7 @@ def plot_scan_results(df):
     '''
     '''
     
-    f=plt.figure(num=20,figsize=[5,3])
+    f=plt.figure(num=21,figsize=[5,3])
     f.subplots_adjust(left=0.15,right=0.84,bottom=0.17,top=0.83)
     f.clear()
     
