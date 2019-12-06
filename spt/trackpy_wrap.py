@@ -69,33 +69,33 @@ def get_link(locs,locs_info,save_picked=False,**params):
     
     '''
     ### Set standard conditions if not set as input
-    search_range=2
-    memory=1
+    search_range=params['search_range']
+    memory=params['memory']
     
-    standard_params={'search_range':search_range,
-                     'memory':memory,
-                     'save_picked':False
-                     }
+#    standard_params={'search_range':search_range,
+#                     'memory':memory,
+#                     'save_picked':False
+#                     }
     ### Procsessing marks: extension&generatedby
     try: extension=locs_info[-1]['extension']+'_picked'
     except: extension='_locs_xxx_picked'
     params['extension']=extension
     params['generatedby']='spt.trackpy_wrap.get_link()'
-
-    ### Remove keys in params that are not needed
-    for key, value in standard_params.items():
-        try:
-            params[key]
-            if params[key]==None: params[key]=standard_params[key]
-        except:
-            params[key]=standard_params[key]
-    ### Remove keys in params that are not needed
-    delete_key=[]
-    for key, value in params.items():
-        if key not in standard_params.keys():
-            delete_key.extend([key])
-    for key in delete_key:
-        del params[key]
+#
+#    ### Remove keys in params that are not needed
+#    for key, value in standard_params.items():
+#        try:
+#            params[key]
+#            if params[key]==None: params[key]=standard_params[key]
+#        except:
+#            params[key]=standard_params[key]
+#    ### Remove keys in params that are not needed
+#    delete_key=[]
+#    for key, value in params.items():
+#        if key not in standard_params.keys():
+#            delete_key.extend([key])
+#    for key in delete_key:
+#        del params[key]
     
     ### Get path of raw data      
     path=locs_info[0]['File']
@@ -233,7 +233,7 @@ def scan_sr_mem(locs,locs_info,locs_dir,sr,mem,length_hp,downsize='crop',save_sc
     '''
     
     '''
-    
+
     #### Downsize image stack either via cropping or time segmentation    
     #### for faster parameter scan
     if downsize=='crop':
@@ -270,7 +270,7 @@ def scan_sr_mem(locs,locs_info,locs_dir,sr,mem,length_hp,downsize='crop',save_sc
             numtracks=link_props['props','len'].size
             df_temp=pd.DataFrame({'len_mean':len_mean,
                                   'numtracks':numtracks,
-                                  'sr':s,'mem':m},index=[('sr','mem')])
+                                  'sr':s,'mem':m},index=[(s,m)])
             df_out=pd.concat([df_out,df_temp])
     #### Plot results
     plot_scan_results(df_out)

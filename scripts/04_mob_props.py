@@ -38,19 +38,20 @@ locs=track.annotate_filter(locs,movie,frame)
 param_scan=True
 #### Define link parameters for scanning optimal search range    
 if param_scan==True:
-    search_range=[1,2,3,5,7,9]
+    search_range=[1,2,3,5,9]
     memory=[1,2]
     length_hp = 20
     #### Get scan results    
     scan_results=track.scan_sr_mem(locs,locs_info,
                                    locs_dir,search_range,memory,
                                    length_hp,downsize='segm',save_scan=False)
+
 #%%
 ######################################## Get link_props with optimal parameters
 params={'search_range':2,
         'memory':1,
         'length_hp':20}
-save_picked=False
+save_picked=True
 #### Link
 link=track.get_link(locs,locs_info,save_picked,**params)
 #### MSDs and fitting
