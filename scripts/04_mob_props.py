@@ -47,14 +47,19 @@ if param_scan==True:
                                    length_hp,downsize='segm',save_scan=False)
 #%%
 ######################################## Get link_props with optimal parameters
-search_range=2
-memory=1
+params={'search_range':2,
+        'memory':1,
+        'length_hp':20}
+save_picked=False
 #### Link
-link=track.get_link(locs,search_range,memory)
+link=track.get_link(locs,locs_info,save_picked,**params)
 #### MSDs and fitting
 #%%
 link_props=track.get_linkprops(link,locs_info,length_hp=20)
+#%%
 #### Save linkprops
 print('Saving linkprops...')
-savename='linkprops_sr%i_mem%i_len_hp%i.h5'%(search_range,memory,length_hp)
+savename='linkprops_sr%i_mem%i_len_hp%i.h5'%(params['search_range'],
+                                             params['memory'],
+                                             params['length_hp'])
 link_props.to_hdf(os.path.join(locs_dir[0],savename),key='link')

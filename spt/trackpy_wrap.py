@@ -248,13 +248,17 @@ def scan_sr_mem(locs,locs_info,locs_dir,sr,mem,length_hp,downsize='crop',save_sc
         seg_size=0.2 # Determines fraction of remaining frames in segment
         locs=locs[locs.frame<=(np.ceil(NoFrames*seg_size))]
     
+    save_picked=False
     #### Scan loop over tuple (search_range,memory) 
     #### Init output
     df_out=pd.DataFrame(columns=['len_mean','numtracks','sr','mem'])
     for s in sr:
         for m in mem:
+            #### Init parameters for get link
+            params={'search_range':s,'memory':m}
+            
             #### Link localizations via trackpy
-            link=get_link(locs,s,m)
+            link=get_link(locs,locs_info,save_picked,**params)
             #### Get link_props without MSD calculation and fitting
             link_props=get_linkprops_noMSD(link,locs_info,length_hp)
             #### Optional saving of scan results in directory
