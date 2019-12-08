@@ -14,11 +14,11 @@ importlib.reload(analyze)
 #%%
 ######################################## Define data
 #### Path to locs.hdf5
-locs_dir=['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-12-04_SLB_fix_and_th/140_wash_slb_B_exp200_p038uW_2_nd_1/19-12-05_JS']
-locs_name=['140_wash_slb_B_exp200_p038uW_2_nd_1_MMStack_Pos1.ome_locs.hdf5']
+locs_dir=['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-12-04_SLB_fix_and_th/140_wash_slb_B_exp200_p038uW_3_nd_1/19-12-05_JS']
+locs_name=['140_wash_slb_B_exp200_p038uW_3_nd_1_MMStack_Pos6.ome_locs.hdf5']
 #### Path to tiff stack
-movie_dir=['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-12-04_SLB_fix_and_th/140_wash_slb_B_exp200_p038uW_2_nd_1']
-movie_name=['140_wash_slb_B_exp200_p038uW_2_nd_1_MMStack_Pos1.ome.tif']
+movie_dir=['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-12-04_SLB_fix_and_th/140_wash_slb_B_exp200_p038uW_3_nd_1/']
+movie_name=['140_wash_slb_B_exp200_p038uW_3_nd_1_MMStack_Pos6.ome.tif']
 
 ######################################## Read in data
 #### Read in locs as DataFrame
@@ -38,7 +38,7 @@ locs=track.annotate_filter(locs,movie,frame)
 param_scan=True
 #### Define link parameters for scanning optimal search range    
 if param_scan==True:
-    search_range=[1,2,3,5,9]
+    search_range=[1,2,3,5]
     memory=[1,2]
     length_hp = 20
     #### Get scan results    
@@ -57,10 +57,9 @@ link=track.get_link(locs,locs_info,save_picked,**params)
 #### MSDs and fitting
 #%%
 link_props=track.get_linkprops(link,locs_info,length_hp=20)
-#%%
 #### Save linkprops
 print('Saving linkprops...')
-savename='linkprops_sr%i_mem%i_len_hp%i.h5'%(params['search_range'],
-                                             params['memory'],
-                                             params['length_hp'])
+pos=locs_name[0].split('_')[10][:4]
+savename='linkprops_%s_sr%i_mem%i_len_hp%i.h5'%(pos, params['search_range'],
+                                                params['memory'],params['length_hp'])                                               
 link_props.to_hdf(os.path.join(locs_dir[0],savename),key='link')
