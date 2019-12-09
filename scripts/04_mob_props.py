@@ -28,11 +28,18 @@ locs=pd.DataFrame(locs)
 #### Read in movie
 movie=io.load_movie(os.path.join(movie_dir[0],movie_name[0]))[0]
 #%%
+importlib.reload(track)
 ######################################## Annotate (& Filter)
 #### Visually inspect detected particle and median nearest neighbor distance
-frame=1
-locs=track.annotate_filter(locs,movie,frame)
-
+frame=23
+locs_filter,ax_list=track.annotate_filter(locs,
+                                          movie,
+                                          frame,
+                                          photon_hp=0,
+                                          c_min=70,
+                                          c_max=250)
+ax_list[0].set_xlim(250,450)
+ax_list[0].set_ylim(250,450)
 #%%
 ######################################## Parameter scan for trackpy
 param_scan=True

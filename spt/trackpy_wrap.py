@@ -4,12 +4,12 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import trackpy as tp
 import os
-plt.style.use('~/lbFCS/styles/paper.mplstyle')
+
 # own modules
 import picasso.io as io
 
 #%%
-def annotate_filter(locs,movie,frame,photon_hp=0):
+def annotate_filter(locs,movie,frame,photon_hp=0,c_min=0,c_max=1000):
     '''
     1) Plots frame of movie with annotated locs with photon values>photon_hp. Median proximity in frame indicated.
     2) Shows histogram of photons values for all locs and locs in frame
@@ -26,42 +26,68 @@ def annotate_filter(locs,movie,frame,photon_hp=0):
     Returns
     --------
     locs_filter:pandas.Dataframe
-        locs that survieved photon high pass
+        locs that survived photon high pass
     '''
-    
-    #### Plot photons
-    f=plt.figure(num=10,figsize=[4,3])
-    f.subplots_adjust(left=0.05,right=0.95,bottom=0.08,top=0.99,hspace=0)
-    f.clear()
-    ax=f.add_subplot(211)
-    bins=np.arange(0,locs.loc[:,'photons'].median()*4,10)
-    ax.hist(locs.loc[:,'photons'],bins=bins,label='all')
-    ax.axvline(photon_hp,ls='-',lw=3,c='r')
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.legend()
-    ax=f.add_subplot(212)
-    ax.hist(locs.loc[locs.frame==frame,'photons'],bins=bins,label='frame=%i'%(frame))
-    ax.axvline(photon_hp,ls='-',lw=3,c='r')
-    ax.set_yticks([])
-    ax.legend()
-    
-    #### Apply photon 'high pass' to locs
+    from matplotlib.gridspec import GridSpec
+      
+    ### Apply photon 'high pass' to locs
     locs_filter=locs.drop(locs[locs.photons<photon_hp].index)
     
-    #### Plot annotate and median proximity
+    ### Define plotting area
     f=plt.figure(num=11,figsize=[6,6])
-    f.subplots_adjust(left=0.,right=0.99,bottom=0.,top=0.95)
+    f.subplots_adjust(left=0.05,right=0.9,bottom=0.05,top=0.95,hspace=0.05,wspace=0.3)
     f.clear()
-    ax=f.add_subplot(111)
-    tp.annotate(locs_filter[locs_filter.frame==frame],movie[frame],ax=ax,invert=True)
-    
+    gs = GridSpec(5,5,figure=f)
+    ax_list=[]
+    ### Annotate
+    ax=f.add_subplot(gs[0:4,0:4])
+    # tp.annotate(locs_filter[locs_filter.frame==frame],movie[frame],ax=ax,invert=True)
+    mapp=ax.imshow(movie[frame],
+                   cmap='gray',
+                   vmin=c_min,
+                   vmax=c_max,
+                   interpolation='nearest',
+                   origin='lower')
+    plt.colorbar(mapp,
+                 cax=f.add_subplot(gs[0:4,4]),
+                 )
+    ax.scatter(locs_filter[locs_filter.frame==frame].x,
+               locs_filter[locs_filter.frame==frame].y,
+               s=100,
+               marker='o',
+               facecolor='none',
+               color='r'
+               )
     med_prox=tp.proximity(locs.loc[locs.frame==frame,:]).median()
     ax.set_title('Median proximity: %.1f px'%(med_prox))
     ax.set_xticks([])
     ax.set_yticks([])
+    ax_list.extend([ax])
+    #### Photon histogram
+    ax=f.add_subplot(gs[4,:5])
+    bins=np.arange(0,locs.loc[:,'photons'].median()*4,10)   
+    ax.hist(locs.loc[:,'photons'],
+            bins=bins,
+            density=True,
+            histtype='step',
+            edgecolor='k',
+            lw=2,
+            label='all')
+    ax.hist(locs.loc[locs.frame==frame,'photons'],
+            bins=bins,
+            density=True,
+            histtype='step',
+            edgecolor='r',
+            lw=2,
+            label='frame=%i'%(frame))
     
-    return locs_filter
+    ax.axvline(photon_hp,ls='--',lw=3,c='k')
+    ax.set_xticks(plt.xticks()[0][1:-2])
+    ax.set_xticklabels(plt.xticks()[0]/1000)
+    ax.set_yticks([])
+    ax.legend()
+    ax_list.extend([ax])
+    return locs_filter,ax_list
 
 #%%
 def get_link(locs,locs_info,save_picked=False,**params):
