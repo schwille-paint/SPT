@@ -30,7 +30,7 @@ movie=io.load_movie(os.path.join(movie_dir[0],movie_name[0]))[0]
 #%%
 importlib.reload(track)
 ######################################## Annotate (& Filter)
-#### Visually inspect detected particle and median nearest neighbor distance
+#### Visually inspect detected particle and median nearest neighbor distance and photon counts
 frame=23
 locs_filter,ax_list=track.annotate_filter(locs,
                                           movie,
@@ -40,6 +40,7 @@ locs_filter,ax_list=track.annotate_filter(locs,
                                           c_max=250)
 ax_list[0].set_xlim(250,450)
 ax_list[0].set_ylim(250,450)
+
 #%%
 ######################################## Parameter scan for trackpy
 param_scan=True
@@ -49,9 +50,14 @@ if param_scan==True:
     memory=[1,2]
     length_hp = 20
     #### Get scan results    
-    scan_results=track.scan_sr_mem(locs,locs_info,
-                                   locs_dir,search_range,memory,
-                                   length_hp,downsize='segm',save_scan=False)
+    scan_results=track.scan_sr_mem(locs_filter,
+                                   locs_info,
+                                   locs_dir,
+                                   search_range,
+                                   memory,
+                                   length_hp,
+                                   downsize='segm',
+                                   save_scan=False)
 
 #%%
 ######################################## Get link_props with optimal parameters
