@@ -130,10 +130,10 @@ def get_start(df,ignore):
     '''
     Get occurence of first localization in group and number of consecutive on frames starting from frame=0.
     '''
-    
+    ### First frame in localizations
     min_frame=df['frame'].min() # First localization in group
-    s_out = pd.Series({'min_frame':min_frame}) # Assign to output
-
+    
+    s_out=pd.Series([])
     for i in ignore:
         taubs=get_taubs(df,ignore=i)[0] # Get taub distribution
         if min_frame<=i:
@@ -149,53 +149,35 @@ def get_start(df,ignore):
     return s_out
 
 #%%
-def get_other(df):
-    """ 
-    Get mean and std values for a single group.
+def get_var(df):
+    '''
+    Get various properties for each group of picked localizations.
     
-    Parameters
-    ---------
-    df : pandas.DataFrame
-        Picked localizations for single group. Required columns are 'frame'.
+    args:
+        df(pandas.DataFrame):  Picked localizations (see picasso.render)
 
-    Returns
-    -------
-    s_out : pandas.Series
-        Length: 6
-        Column:
-            'group' : int
-        Index: 
-            'mean_frame' : float64
-                Mean of frames for all localizations in group
-            'mean_x' : float64
-                Mean x position
-            'mean_y' : float64
-                Mean y position
-            'mean_photons' : float64
-                Mean of photons for all localizations in group
-            'mean_bg' : float64
-                Mean background
-            'std_frame' : flaot64
-                Standard deviation of frames for all localizations in group
-            'std_x' : float64
-                Standard deviation of x position
-            'std_y' : float64
-                Standard deviation of y position
-            'std_photons' : float64
-                Standard deviation of photons for all localizations in group
-            'n_locs' : int
-                Number of localizations in group
-    """
-    # Get mean values
-    s_mean=df[['frame','x','y','photons','bg']].mean()
-    # Get number of localizations
-    s_mean['n_locs']=len(df)
-    mean_idx={'frame':'mean_frame','x':'mean_x','y':'mean_y','photons':'mean_photons','mean_bg':'bg'}
-    # Get std values
-    s_std=df[['frame','x','y','photons']].std()
-    std_idx={'frame':'std_frame','x':'std_x','y':'std_y','photons':'std_photons'}
-    # Combine output
-    s_out=pd.concat([s_mean.rename(mean_idx),s_std.rename(std_idx)])
+    returns:
+        s_out(pandas.Series): index: Means of all columns in df, plus:
+                                'n_locs':      Number of localizations
+                                'photons':     Not mean but median!
+                                'std_photons': Standard deviation of photons.
+                                'bg':          Background photons. Not mean but median!
+                                'lp_x':        Standard deviation of group in 'x'
+                                'lp_y':        Standard deviation of group in 'y'
+                                 
+    '''
+    ### Get all mean values
+    s_out=df.mean()
+    s_out['n_locs']=len(df) # append no. of locs.
+    ### Set photon values to median
+    s_out[['photons','bg']]=df[['photons','bg']].median()
+    ### Set lpx and lpy to standard deviation in x,y for proper visualization in picasso.render
+    s_out[['lpx','lpy',]]=df[['x','y']].std()
+    ### Add std_photons
+    s_out['std_photons']=df['photons'].std()
+    ### Add min/max of frames
+    s_out['min_frame']=df['frame'].min()
+    s_out['max_frame']=df['frame'].max()
     
     return s_out
 
@@ -206,34 +188,29 @@ def get_props(df,Ts,ignore=1):
         - get_NgT(df,Ts,ignore)
         - get_start(df,ignore)
     
-    Parameters
-    ---------
-    df : pandas.DataFrame
-        'locs' of locs_picked.hdf5 as given by Picasso
-    ignore: int
-        Ignore as defined in props.get_tau
-    Returns
-    -------
-    s : pandas.DataFrame
-        Columns as defined in individual functions. Index corresponds to 'group'.
+    args:
+        
+    returns:
+        
     """
     
     # Call individual functions
-    s_other=get_other(df)
+    s_var=get_var(df)
     s_start=get_start(df,[0,1,2,3,4,5])
     s_NgT=get_NgT(df,Ts,ignore)
     
     
     # Combine output
-    s_out=pd.concat([s_other,s_start,s_NgT])
+    s_out=pd.concat([s_var,s_start,s_NgT])
     
     return s_out
 
 #%%
 def apply_props(df,
-                Ts=np.concatenate((np.arange(1,10,1),
-                                   np.arange(10,41,10),
-                                   np.arange(50,1951,50),
+                Ts=np.concatenate((np.arange(1,50,1),
+                                   np.arange(50,91,10),
+                                   np.arange(100,381,20),
+                                   np.arange(400,1951,50),
                                    np.arange(2000,4801,200),
                                    np.arange(5000,50001,1000)),axis=0),
                 ignore=1):
@@ -249,11 +226,12 @@ def apply_props(df,
 
 #%%
 def apply_props_dask(df,
-                     Ts=np.concatenate((np.arange(1,10,1),
-                                           np.arange(10,41,10),
-                                           np.arange(50,1951,50),
-                                           np.arange(2000,4801,200),
-                                           np.arange(5000,50001,1000)),axis=0),
+                     Ts=np.concatenate((np.arange(1,50,1),
+                                        np.arange(50,91,10),
+                                        np.arange(100,381,20),
+                                        np.arange(400,1951,50),
+                                        np.arange(2000,4801,200),
+                                        np.arange(5000,50001,1000)),axis=0),
                     ignore=1,
                     NoPartitions=30): 
     """
