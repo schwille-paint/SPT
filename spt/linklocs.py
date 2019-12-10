@@ -177,7 +177,7 @@ def drop_shorttracks(df,crit_len=10):
     '''
     ### Helper function to assign group length to all locs for later removal    
     def get_len(df,crit_len):
-        s_out=pd.Series(np.ones(len(df))*len(df))
+        s_out=pd.Series(np.ones(len(df))*(df.frame.max()-df.frame.min()))
         return s_out
     
     ### Assign group length to locs

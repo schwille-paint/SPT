@@ -7,10 +7,10 @@ import sys
 # warnings.filterwarnings("ignore")
 
 import picasso_addon.io as addon_io
-import spt.immob_props as immob_props
+import spt.immobile_props as improps
 
 #%%
-def get_props(df,Ts,ignore):
+def get_props(df,ignore):
     """ 
     Wrapper function to combine:
     
@@ -27,29 +27,23 @@ def get_props(df,Ts,ignore):
     
     # Call individual functions
     
-    s_other=immob_props.get_other(df)
-    s_NgT=s_other
-    s_msd=s_other
+    s_var=improps.get_var(df)
+    s_msd=pd.Series([])
     
         
     # Combine output
-    s_out=pd.concat([s_NgT,s_msd,s_other])
+    s_out=pd.concat([s_msd,s_var])
     
     return s_out
 
 #%%
 def apply_props(df,
-                Ts=np.concatenate((np.arange(1,10,1),
-                                   np.arange(10,41,10),
-                                   np.arange(50,1951,50),
-                                   np.arange(2000,4801,200),
-                                   np.arange(5000,50001,1000)),axis=0),
                 ignore=1):
     """ 
           
     """
     tqdm.pandas() # For progressbar under apply
-    df_props = df.groupby('group').progress_apply(lambda df: get_props(df,Ts,ignore))
+    df_props = df.groupby('group').progress_apply(lambda df: get_props(df,ignore))
 
     df_props.dropna(inplace=True)
     
@@ -57,33 +51,26 @@ def apply_props(df,
 
 #%%
 def apply_props_dask(df,
-                     Ts=np.concatenate((np.arange(1,10,1),
-                                           np.arange(10,41,10),
-                                           np.arange(50,1951,50),
-                                           np.arange(2000,4801,200),
-                                           np.arange(5000,50001,1000)),axis=0),
-                    ignore=1,
-                    NoPartitions=30): 
+                     ignore=1,
+                     NoPartitions=30): 
     """
-    Applies pick_props.get_props(df,NoFrames,ignore) to each group in parallelized manner using dask by splitting df into 
+    Applies mob_props.get_props(df,NoFrames,ignore) to each group in parallelized manner using dask by splitting df into 
     various partitions.
     """
-    ########### Load packages
-#    import dask
-#    import dask.multiprocessing
+    ### Load packages
     import dask.dataframe as dd
     from dask.diagnostics import ProgressBar
-    ########### Globally set dask scheduler to processes
-#    dask.config.set(scheduler='processes')
-#    dask.set_options(get=dask.multiprocessing.get)
-    ########### Partionate df using dask for parallelized computation
+
+    ### Prepare dask.DataFrame
     df=df.set_index('group') # Set group as index otherwise groups will be split during partition!!!
     df=dd.from_pandas(df,npartitions=NoPartitions) 
-    ########### Define apply_props for dask which will be applied to different partitions of df
-    def apply_props_2part(df,Ts,ignore): return df.groupby('group').apply(lambda df: get_props(df,Ts,ignore))
-    ########### Map apply_props_2part to every partition of df for parallelized computing    
+    
+    ### Define apply_props for dask which will be applied to different partitions of df
+    def apply_props_2part(df,ignore): return df.groupby('group').apply(lambda df: get_props(df,ignore))
+    
+    ### Map apply_props_2part to every partition of df for parallelized computing    
     with ProgressBar():
-        df_props=df.map_partitions(apply_props_2part,Ts,ignore).compute(scheduler='processes')
+        df_props=df.map_partitions(apply_props_2part,ignore).compute(scheduler='processes')
     return df_props
 
 #%%
@@ -109,19 +96,20 @@ def main(locs,info,**params):
                                    Will be saved with extension '_picked_tprops.hdf5' for usage in picasso.filter
     '''
     
-    ### Set standard conditions if not set as input
+    ### Define standard 
     standard_params={'ignore':1,
                      'parallel':True,
                      'NoPartitions':30,
-                     'filter':'paint'
+                     #'filter':'paint'
                      }
-    ### Remove keys in params that are not needed
+    ### Set standard if not contained in params
     for key, value in standard_params.items():
         try:
             params[key]
             if params[key]==None: params[key]=standard_params[key]
         except:
             params[key]=standard_params[key]
+    
     ### Remove keys in params that are not needed
     delete_key=[]
     for key, value in params.items():
@@ -129,17 +117,22 @@ def main(locs,info,**params):
             delete_key.extend([key])
     for key in delete_key:
         del params[key]
-        
-    ### Procsessing marks: extension&generatedby
-    try: extension=info[-1]['extension']+'_tprops'
-    except: extension='_locs_xxx_picked_tprops'
+    
+    ### Override ignore if memory in info
+    try:
+        params['ignore']=info[-1]['memory']
+    except:
+        pass
+    
+    ### Processing marks: extension&generatedby
+    try: extension=info[-1]['extension']+'_tmobprops'
+    except: extension='_locs_pickedxxxx_tmobprops'
     params['extension']=extension
-    params['generatedby']='spt.immobile_props.main()'
+    params['generatedby']='spt.mob_props.main()'
     
     ### Get path of and number of frames
     path=info[0]['File']
     path=os.path.splitext(path)[0]
-    NoFrames=info[0]['Frames']
     
     ### Calculate kinetic properties
     print('Calculating kinetic information ...')
@@ -153,18 +146,18 @@ def main(locs,info,**params):
         locs_props=apply_props(locs,
                                     ignore=params['ignore'],
                                     )
-    ### Filtering
-    print('Filtering ..(%s)'%(params['filter']))
-    params['NoGroups_nofilter']=len(locs_props) # Number of groups before filter
-    locs_props=filter_(locs_props,NoFrames,params['filter']) # Apply filter
-    params['NoGroups_filter']=len(locs_props) # Number of groups after filter
+    # ### Filtering
+    # print('Filtering ..(%s)'%(params['filter']))
+    # params['NoGroups_nofilter']=len(locs_props) # Number of groups before filter
+    # locs_props=filter_(locs_props,NoFrames,params['filter']) # Apply filter
+    # params['NoGroups_filter']=len(locs_props) # Number of groups after filter
 
 
     print('Saving _tprops ...')
     info_props=info.copy()+[params]
     addon_io.save_locs(path+extension+'.hdf5',
-                       locs_props,
-                       info_props,
-                       mode='picasso_compatible')
+                        locs_props,
+                        info_props,
+                        mode='picasso_compatible')
 
     return [params,locs_props]

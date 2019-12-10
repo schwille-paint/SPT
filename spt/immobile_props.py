@@ -320,19 +320,20 @@ def main(locs,info,**params):
                                    Will be saved with extension '_picked_tprops.hdf5' for usage in picasso.filter
     '''
     
-    ### Set standard conditions if not set as input
+    ### Define standard 
     standard_params={'ignore':1,
                      'parallel':True,
                      'NoPartitions':30,
                      'filter':'paint'
                      }
-    ### Remove keys in params that are not needed
+    ### Set standard if not contained in params
     for key, value in standard_params.items():
         try:
             params[key]
             if params[key]==None: params[key]=standard_params[key]
         except:
             params[key]=standard_params[key]
+    
     ### Remove keys in params that are not needed
     delete_key=[]
     for key, value in params.items():
