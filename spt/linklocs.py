@@ -57,8 +57,10 @@ def annotate_filter(locs,movie,frame=1,mng=0,c_min=0,c_max=1000):
                color='r'
                )
     
-    med_prox=tp.proximity(locs.loc[locs.frame==frame,:]).median()
-    ax.set_title('Median proximity: %.1f px'%(med_prox))
+    iq1_prox_frame=np.percentile(tp.proximity(locs.loc[locs.frame==frame,:]),25) # NN distance in frame
+    iq1_prox_first=[np.percentile(tp.proximity(locs.loc[locs.frame==f,:]),25) for f in range(100)]
+    iq1_prox_first=np.mean(iq1_prox_first) # NN distance in frist 100 frames
+    ax.set_title(r'75% of all NN distances in frame > '+'%.1f px (%.1f)'%(iq1_prox_frame,iq1_prox_first))
     ax.set_xticks([])
     ax.set_yticks([])
     ax_list.extend([ax])
@@ -122,7 +124,7 @@ def get_link(locs,info,search_range,memory,mng=0,link_strategy='hybrid',save=Fal
                np.mod(memory,10),
                )
     try: extension=info[-1]['extension']+'_picked%s%s'%(sr,mr)
-    except: extension='_locs_xxx_picked'
+    except: extension='_locs_xxx_picked%s%s'%(sr,mr)
     params['extension']=extension
     params['generatedby']='spt.linklocs.get_link()'
 
@@ -177,13 +179,13 @@ def drop_shorttracks(df,crit_len=10):
     '''
     ### Helper function to assign group length to all locs for later removal    
     def get_len(df,crit_len):
-        s_out=pd.Series(np.ones(len(df))*(df.frame.max()-df.frame.min()))
+        s_out=pd.Series(np.ones(len(df))*len(df))
         return s_out
     
     ### Assign group length to locs
     len_group=df.groupby('group').apply(lambda df: get_len(df,crit_len))
-    df_out=df.assign(length=len_group.values)
-    df_out=df_out[df_out.length>=crit_len]
+    df_out=df.assign(n_locs=len_group.values)
+    df_out=df_out[df_out.n_locs>=crit_len]
     
     return df_out
 
@@ -223,7 +225,7 @@ def scan_sr_mem(locs,info,sr,mem,roi=True,timewindow=True):
             #### Link localizations via trackpy
             link=get_link(locs,info,s,m,save=False)[1]  
             ### Assign
-            len_mean=link.length.mean()
+            len_mean=link.n_locs.mean()
             num_tracks=len(link.group.unique())
             df_temp=pd.DataFrame({'len_mean':len_mean,
                                   'numtracks':num_tracks,

@@ -3,12 +3,90 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import sys
+from scipy.optimize import curve_fit
 # import warnings
 # warnings.filterwarnings("ignore")
 
 import picasso_addon.io as addon_io
+import trackpy.motion as motion
+import spt.analyze as analyze
 import spt.immobile_props as improps
 
+
+#%%
+def get_msd(df,detail=False):
+    '''
+    Return mean-square-displacement of one group using trackpy implementation in units of px^2/frame.
+    
+    args:
+        df(pd.DataFrame):     Localizations of single trajectory (see trackpy.motion.msd())
+        max_lagtime(int=200): Maximum lagtime up to which msd is computed.
+        detail(bool=False):   Detail as defined in trackpy.motion.msd().
+
+    '''
+    max_lagtime=int(np.floor(0.2*len(df))) # Only compute msd up to a quarter of trajectory length
+    msd=motion.msd(df,
+                   mpp=1,
+                   fps=1,
+                   max_lagtime=max_lagtime,
+                   detail=detail,
+                   pos_columns=None,
+                   )
+    
+    msd=msd.msd # Get only mean square displacement, since aslo <x>, <x^2>, ... are computed
+    
+    return msd
+
+#%%
+def revert_time(df):
+    '''
+    Revert time of trace to check for multiple diffusion modes within trace.
+    '''
+    df_revert=df.copy()
+    df_revert.x=df.x.values[::-1]
+    df_revert.y=df.y.values[::-1]
+    
+    return df_revert
+
+#%%
+def get_jdist(df,interval):
+    '''
+    Return jump distances r^2 within time interval (frames).
+    '''
+    ### Get coordinates ad timestamp
+    x=df.x.values
+    y=df.y.values
+    t=df.frame.values
+    ### Get jumps
+    dx=x[interval:]-x[:-interval]
+    dy=y[interval:]-y[:-interval]
+    dt=t[interval:]-t[:-interval]
+    ### Get squared radial jump distance
+    dr=dx**2+dy**2
+    ### Remove jump distances where time stamp difference is greater than interval
+    ### du to missin frames!
+    dr=dr[dt==interval]
+    
+    return dr
+
+#%%
+def get_jdist_ecdf(jdist): 
+   '''
+   Get empirical cumulative distribution function of jump distance distribution.
+   '''
+   ecdf=analyze.get_ecdf(jdist)
+   ecdf[1]=1-ecdf[1]
+   
+   return ecdf
+
+#%%
+# def fit_jdist_ecdf(jdist):
+#     ecdf=get_jdist_ecdf(jdist)
+    
+#     try:
+        
+    
+    
 #%%
 def get_props(df,ignore):
     """ 
