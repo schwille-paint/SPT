@@ -27,7 +27,7 @@ def get_ecdf(x):
     counts_l=np.concatenate([[0],counts_leq[0:-1]]) # Empirical cfd counts(X<x)
     counts_l = counts_l/counts_leq[-1] # normalize that sum(counts) = 1, i.e. now P(X<x)
     counts_l_inv=1-counts_l # Empirical cfd inverse, i.e. P(X>=x)
-    return (values,counts_l_inv)
+    return [values,counts_l_inv]
 
 #%%
 def get_half_time(df):

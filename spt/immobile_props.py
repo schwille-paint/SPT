@@ -162,8 +162,8 @@ def get_var(df):
                                 'photons':     Not mean but median!
                                 'std_photons': Standard deviation of photons.
                                 'bg':          Background photons. Not mean but median!
-                                'lp_x':        Standard deviation of group in 'x'
-                                'lp_y':        Standard deviation of group in 'y'
+                                'sx':          Standard deviation of group in 'x'
+                                'sy':          Standard deviation of group in 'y'
                                 'min_frame':   Mimimum in frames
                                 'max_frame':   Maximum in frames
                                 'len':         max_frame-min_frame (see above)
@@ -172,8 +172,8 @@ def get_var(df):
     s_out=df.mean()
     ### Set photon values to median
     s_out[['photons','bg']]=df[['photons','bg']].median()
-    ### Set lpx and lpy to standard deviation in x,y for proper visualization in picasso.render
-    s_out[['lpx','lpy',]]=df[['x','y']].std()
+    ### Set sx and sy to standard deviation in x,y (locs!) instead of mean of sx,sy (PSF width)
+    s_out[['sx','sy',]]=df[['x','y']].std()
     ### Add std_photons
     s_out['std_photons']=df['photons'].std()
     ### Add min/max of frames
