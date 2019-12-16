@@ -2,47 +2,17 @@ import os
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-import sys
 from scipy.optimize import curve_fit
+import time
 # import warnings
 # warnings.filterwarnings("ignore")
 
 import picasso_addon.io as addon_io
 import trackpy.motion as motion
-import spt.analyze as analyze
 import spt.immobile_props as improps
+import spt.motion_metrics as metrics
 import spt.analytic_expressions as express
 
-#%%
-def get_jdist(df,interval):
-    '''
-    Return jump distances r^2 within time interval (frames).
-    '''
-    ### Get coordinates ad timestamp
-    x=df.x.values
-    y=df.y.values
-    t=df.frame.values
-    ### Get jumps
-    dx=x[interval:]-x[:-interval]
-    dy=y[interval:]-y[:-interval]
-    dt=t[interval:]-t[:-interval]
-    ### Get squared radial jump distance
-    dr=dx**2+dy**2
-    ### Remove jump distances where time stamp difference is greater than interval
-    ### du to missin frames!
-    dr=dr[dt==interval]
-    
-    return dr
-
-#%%
-def get_jdist_ecdf(jdist): 
-   '''
-   Get empirical cumulative distribution function of jump distance distribution.
-   '''
-   ecdf=analyze.get_ecdf(jdist)
-   ecdf[1]=1-ecdf[1]
-   
-   return ecdf
 
 #%%
 def get_msd(df,detail=False):
@@ -57,101 +27,76 @@ def get_msd(df,detail=False):
     N=len(df)
     max_lagtime=int(np.floor(0.2*N)) # Only compute msd up to a quarter of trajectory length
     msd=motion.msd(df,
-                   mpp=1,
-                   fps=1,
-                   max_lagtime=max_lagtime,
-                   detail=detail,
-                   pos_columns=None,
-                   )
+                    mpp=1,
+                    fps=1,
+                    max_lagtime=max_lagtime,
+                    detail=detail,
+                    pos_columns=None,
+                    )
     
     msd=msd.msd # Get only mean square displacement, since aslo <x>, <x^2>, ... are computed
     
-    ### Get absolute standard deviation of all points in msd
-    msd_std=express.msd_abs_std(msd,N)
-    
-    return [msd,msd_std]
+  
+    return msd
 
 #%%
-def fit_msd_free(msd,msd_std,offset=False):
+def fit_msd_free(lagtimes,msd,offset=False):
     '''
     
     '''
-    ### Prepare fit 
-    x=msd.index.astype(float)
+    x=lagtimes
     y=msd
-    y_std=msd_std
-    ### Initial value
-    p0=[(msd.iloc[-1]-msd.iloc[0])/len(msd),msd.iloc[0]]
-    try:
-        if offset==True:
-            popt,pcov=curve_fit(express.msd_free,x,y,p0=p0)
-            chi2=np.sum(np.square((y-express.msd_free(x,*popt))/y_std))/(len(msd)-2) # reduced chi square
-        else:
-            popt,pcov=curve_fit(express.msd_free,x,y,p0=p0[0])
-            chi2=np.sum(np.square((y-express.msd_free(x,popt[0]))/y_std))/(len(msd)-1) # reduced chi square
+    N=len(y)
 
-    except:
+    if N>=2: # Try ftting if more than one point in msd
+        ### Init fit parameters
+        p0=[(y[-1]-y[0])/N,y[0]] # Start values
+       
+        try:
+            if offset==True:
+                popt,pcov=curve_fit(express.msd_free,x,y,p0=p0)
+            else:
+                popt,pcov=curve_fit(express.msd_free,x,y,p0=p0[0])
+        except:
+            popt=np.full(2,np.nan)
+
+    else:
         popt=np.full(2,np.nan)
-        chi2=np.nan
+    
     ### Assign to output
     if offset==True:
-        s_out=pd.Series({'a':popt[0],'b':popt[1],'chi2':chi2,'mode':'free'})
+        s_out=pd.Series({'a':popt[0],'b':popt[1]})
     else:
-        s_out=pd.Series({'a':popt[0],'b':0,'chi2':chi2,'mode':'free'})
+        s_out=pd.Series({'a':popt[0],'b':0})
         
     return s_out
 
 #%%
-def fit_msd_confined(msd,msd_std):
+def fit_msd_anomal(lagtimes,msd):
     '''
     
     '''
-    ### Prepare fit 
-    x=msd.index.astype(float)
+    x=lagtimes
     y=msd
-    y_std=msd_std
-    ### Initial value
-    p0=[0,0]
-    p0[0]=np.max(msd)
-    halfmsd=(msd.max()-msd.min())*0.5+msd.min()
-    p0[1]=msd[msd<=halfmsd].values[-1]
-    try:
-        popt,pcov=curve_fit(express.msd_confined,x,y,p0=p0)
-        chi2=np.sum(np.square((y-express.msd_confined(x,*popt))/y_std))/(len(msd)-2) # reduced chi square
-    except:
+    N=len(y)
+    
+    if N>=2: # Try ftting if more than one point in msd
+        ### Init fit parameters
+        p0=[(y[-1]-y[0])/N,1.0] # Start values
+        try:
+            popt,pcov=curve_fit(express.msd_anomal,x,y,p0=p0)
+        except:
+            popt=np.full(2,np.nan)
+    else:
         popt=np.full(2,np.nan)
-        chi2=np.nan
+    
     ### Assign to output
-    s_out=pd.Series({'a':popt[0],'b':popt[1],'chi2':chi2,'mode':'confined'})
+    s_out=pd.Series({'a':popt[0],'b':popt[1]})
     
     return s_out
 
 #%%
-def fit_msd_anomal(msd,msd_std):
-    '''
-    
-    '''
-    ### Prepare fit 
-    x=msd.index.astype(float)
-    y=msd
-    y_std=msd_std
-    ### Initial value
-    p0=[0,0]
-    p0[0]=(msd.iloc[-1]-msd.iloc[0])/len(msd)
-    p0[1]=1.0
-    try:
-        popt,pcov=curve_fit(express.msd_anomal,x,y,p0=p0)
-        chi2=np.sum(np.square((y-express.msd_anomal(x,*popt))/y_std))/(len(msd)-2) # reduced chi square
-    except:
-        popt=np.full(2,np.nan)
-        chi2=np.nan
-    ### Assign to output
-    s_out=pd.Series({'a':popt[0],'b':popt[1],'chi2':chi2,'mode':'anomal'})
-    
-    return s_out
-
-#%%
-def fit_msd_free_iterative(msd,msd_std,lp,max_it=5):
+def fit_msd_free_iterative(lagtimes,msd,lp,max_it=5):
     '''
     
     '''
@@ -162,11 +107,11 @@ def fit_msd_free_iterative(msd,msd_std,lp,max_it=5):
     i=0
     while i<max_it:
         ### Truncate msd up to p for optimal fitting result
-        msd_iter=msd[:p[-1]]    
-        msd_std_iter=msd_std[:p[-1]] 
-        
+        x=lagtimes[:p[-1]]
+        y=msd[:p[-1]]    
+
         ### Fit truncated msd
-        s_out=fit_msd_free(msd_iter,msd_std_iter,offset=True)
+        s_out=fit_msd_free(x,y,offset=True)
         
         ### Update x
         x=np.abs(lp/(s_out['a']/4))
@@ -186,12 +131,7 @@ def fit_msd_free_iterative(msd,msd_std,lp,max_it=5):
             break
         i+=1
     
-    if s_out['a']!=np.nan:
-        x=msd_iter.index.astype(float)
-        popt=[s_out['a'],s_out['b']]
-        s_out['chi2']=np.sum(np.square((msd_iter-express.msd_free(x,*popt))/msd_std_iter))/(len(msd_iter)-2) # reduced chi square
     
-    s_out['mode']='iterative'
     return s_out
 
 #%%
@@ -200,56 +140,31 @@ def getfit_msd(df,lp,offset=False):
     Calculate msd of single trjecory using get_msd and apply all fit methods.
     '''
     
-    ### Get msd
-    msd=get_msd(df)
+    ### Get mean displacement moments
+    t0=time.time() # Timing
+    moments=metrics.mean_displacement_moments(df.frame.values,
+                                              df.x.values,
+                                              df.y.values) 
+    x=moments[:,0] # Define lagtimes, x values for fit
+    y=moments[:,1] # Define msd, y values for fit
+    t_msd=time.time()-t0 # Timing
     
     ### Try every fitting method
-    df_fit=pd.DataFrame([],columns=['a','b','chi2','mode','p','max_it'])
-    df_fit.loc[0,:]=fit_msd_free(msd[0],msd[1],offset=offset)
-    df_fit.loc[1,:]=fit_msd_confined(msd[0],msd[1])
-    df_fit.loc[2,:]=fit_msd_anomal(msd[0],msd[1])
-    df_fit.loc[3,:]=fit_msd_free_iterative(msd[0],msd[1],lp)
+    t0=time.time() # Timing
+    s_free=fit_msd_free(x,y,offset=offset).rename({'a':'a_free','b':'b_free'})
+    s_anom=fit_msd_anomal(x,y).rename({'a':'a_anom','b':'b_anom'})
+    s_iter=fit_msd_free_iterative(x,y,lp).rename({'a':'a_iter','b':'b_iter','p':'p_iter','max_it':'max_iter'})
+    t_fit=time.time()-t0
     
     ### Asign output series
-    s_out=pd.concat([df_fit.iloc[0,0:3].rename({'a':'a_free','b':'b_free','chi2':'chi_free'}),
-                     df_fit.iloc[1,0:3].rename({'a':'a_conf','b':'b_conf','chi2':'chi_conf'}),
-                     df_fit.iloc[2,0:3].rename({'a':'a_anom','b':'b_anom','chi2':'chi_anom'}),
-                     df_fit.iloc[3,[0,1,2,4,5]].rename({'a':'a_iter','b':'b_iter','chi2':'chi_iter','p':'p_iter','max_it':'max_iter'}),
+    s_out=pd.concat([s_free,
+                     s_anom,
+                     s_iter,
+                     pd.Series({'t_msd':t_msd,'t_fit':t_fit}),
                      ])
     
-    return [s_out,msd,df_fit]
-
-#%%
-def decide_fit(msd,df_fit,choose='opt'):
-    
-    ### Sort by residual
-    df_fit=df_fit.sort_values(by=['chi2'])
-    
-    if choose=='opt':
-        s_fit=df_fit.iloc[0,:]
-    else:
-        s_fit=df_fit.iloc[choose,:]
-    
-    ### Return evaluation of fit
-    x=msd.index.astype(float)
-    if s_fit['mode']=='free':
-        y=express.msd_free(x,s_fit['a'],s_fit['b'])
-    elif s_fit['mode']=='confined':
-        y=express.msd_confined(x,s_fit['a'],s_fit['b']) 
-    elif s_fit['mode']=='anomal':
-        y=express.msd_anomal(x,s_fit['a'],s_fit['b'])
-    elif s_fit['mode']=='iterative':
-        y=express.msd_free(x,s_fit['a'],s_fit['b']) 
-        
-    return [y,s_fit['mode']]
-
-#%%
-def get_fakeprops(df):
-    msd=get_msd(df)
-    
-    s_out=pd.Series({'a_iter':0})
-    
     return s_out
+
 #%%
 def get_props(df,lp,offset=False):
     """ 
@@ -269,8 +184,7 @@ def get_props(df,lp,offset=False):
     # Call individual functions
     
     s_var=improps.get_var(df)
-    s_msd=getfit_msd(df,lp,offset)[0]
-    # s_fake=get_fakeprops(df)
+    s_msd=getfit_msd(df,lp,offset)
         
     # Combine output
     s_out=pd.concat([s_var,s_msd])
@@ -301,7 +215,10 @@ def apply_props_dask(df,
     ### Load packages
     import dask.dataframe as dd
     from dask.diagnostics import ProgressBar
-
+    # from dask.distributed import Client
+    
+    # client = Client(n_workers=30, threads_per_worker=1, processes=False, memory_limit='2GB')
+    
     ### Prepare dask.DataFrame
     df=df.set_index('group') # Set group as index otherwise groups will be split during partition!!!
     df=dd.from_pandas(df,npartitions=NoPartitions) 
@@ -309,42 +226,10 @@ def apply_props_dask(df,
     ### Define apply_props for dask which will be applied to different partitions of df
     def apply_props_2part(df,lp,offset): return df.groupby('group').apply(lambda df: get_props(df,lp,offset))
     
-    ### Create meta (dict) with correct column names so that dask knows output
-    meta_dict={'a_free':'f8',
-               'b_free' :'i8',
-               'chi_free':'f8',
-               'a_conf':'f8',
-               'b_conf':'f8',
-               'chi_conf':'f8',
-               'a_anom':'f8',
-               'b_anom':'f8',
-               'chi_anom':'f8',
-               'a_iter':'f8',
-               'b_iter':'f8',
-               'chi_iter':'f8',
-               'p_iter':'i8',
-               'max_iter':'f8',
-               'frame':'f8',
-               'x':'f8',
-               'y':'f8',
-               'photons':'f8',
-               'sx':'f8',
-               'sy':'f8',
-               'bg':'f8',
-               'lpx':'f8',
-               'lpy':'f8',
-               'ellipticity':'f8',
-               'net_gradient':'f8',
-               'n_locs':'f8',
-               'std_photons':'f8', 
-               'min_frame':'f8',
-               'max_frame':'f8',
-               'len':'f8',
-               }
-    
     ### Map apply_props_2part to every partition of df for parallelized computing    
     with ProgressBar():
-        df_props=df.map_partitions(apply_props_2part,lp,offset,meta=meta_dict).compute(scheduler='processes')
+        df_props=df.map_partitions(apply_props_2part,lp,offset).compute(scheduler='processes')
+    
     return df_props
 
 #%%
