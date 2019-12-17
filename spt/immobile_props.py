@@ -75,11 +75,19 @@ def get_taubs(df,ignore=1):
 def taubs_to_NgT(taubs,
                  start_frames,
                  taubs_photons,
-                 taubs_photons_err,
-                 Ts):
+                 taubs_photons_err):
     '''
     Return number of bright times greater than Ts as array of len(Ts).
     '''
+    ### Define Ts
+    Ts=np.concatenate((np.arange(1,50,1),
+                       np.arange(50,91,10),
+                       np.arange(100,381,20),
+                       np.arange(400,1951,50),
+                       np.arange(2000,4801,200),
+                       np.arange(5000,50001,1000)),axis=0)
+    
+    ### Init observables
     NgT=np.zeros(len(Ts))
     NgT_start=np.zeros(len(Ts))
     NgT_photons=np.zeros(len(Ts))
@@ -111,7 +119,7 @@ def taubs_to_NgT(taubs,
     return s_out
 
 #%%
-def get_NgT(df,Ts,ignore=1):
+def get_NgT(df,ignore=1):
     '''
     Combine get_taubs and taubs_to_NgT to return NgT as pd.Series.
     '''
@@ -120,8 +128,7 @@ def get_NgT(df,Ts,ignore=1):
     NgT=taubs_to_NgT(taubs,
                      start_frames,
                      taubs_photons,
-                     taubs_photons_err,
-                     Ts)
+                     taubs_photons_err)
     
     return NgT
     
@@ -184,7 +191,7 @@ def get_var(df):
     return s_out
 
 #%%
-def get_props(df,Ts,ignore=1):
+def get_props(df,ignore=1):
     """ 
     Wrapper function to combine:
         - get_NgT(df,Ts,ignore)
@@ -199,7 +206,7 @@ def get_props(df,Ts,ignore=1):
     # Call individual functions
     s_var=get_var(df)
     s_start=get_start(df,[0,1,2,3,4,5])
-    s_NgT=get_NgT(df,Ts,ignore)
+    s_NgT=get_NgT(df,ignore)
     
     
     # Combine output
@@ -209,18 +216,12 @@ def get_props(df,Ts,ignore=1):
 
 #%%
 def apply_props(df,
-                Ts=np.concatenate((np.arange(1,50,1),
-                                   np.arange(50,91,10),
-                                   np.arange(100,381,20),
-                                   np.arange(400,1951,50),
-                                   np.arange(2000,4801,200),
-                                   np.arange(5000,50001,1000)),axis=0),
                 ignore=1):
     """ 
           
     """
     tqdm.pandas() # For progressbar under apply
-    df_props = df.groupby('group').progress_apply(lambda df: get_props(df,Ts,ignore))
+    df_props = df.groupby('group').progress_apply(lambda df: get_props(df,ignore))
 
     df_props.dropna(inplace=True)
     
@@ -228,12 +229,6 @@ def apply_props(df,
 
 #%%
 def apply_props_dask(df,
-                     Ts=np.concatenate((np.arange(1,50,1),
-                                        np.arange(50,91,10),
-                                        np.arange(100,381,20),
-                                        np.arange(400,1951,50),
-                                        np.arange(2000,4801,200),
-                                        np.arange(5000,50001,1000)),axis=0),
                     ignore=1,
                     NoPartitions=30): 
     """
@@ -252,10 +247,10 @@ def apply_props_dask(df,
     df=df.set_index('group') # Set group as index otherwise groups will be split during partition!!!
     df=dd.from_pandas(df,npartitions=NoPartitions) 
     ########### Define apply_props for dask which will be applied to different partitions of df
-    def apply_props_2part(df,Ts,ignore): return df.groupby('group').apply(lambda df: get_props(df,Ts,ignore))
+    def apply_props_2part(df,ignore): return df.groupby('group').apply(lambda df: get_props(df,ignore))
     ########### Map apply_props_2part to every partition of df for parallelized computing    
     with ProgressBar():
-        df_props=df.map_partitions(apply_props_2part,Ts,ignore).compute(scheduler='processes')
+        df_props=df.map_partitions(apply_props_2part,ignore).compute(scheduler='processes')
     return df_props
 
 #%%

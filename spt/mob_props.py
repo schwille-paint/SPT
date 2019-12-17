@@ -15,31 +15,6 @@ import spt.analytic_expressions as express
 
 
 #%%
-def get_msd(df,detail=False):
-    '''
-    Return mean-square-displacement of one group using trackpy implementation in units of px^2/frame.
-    
-    args:
-        df(pd.DataFrame):     Localizations of single trajectory (see trackpy.motion.msd())
-        detail(bool=False):   Detail as defined in trackpy.motion.msd().
-
-    '''
-    N=len(df)
-    max_lagtime=int(np.floor(0.2*N)) # Only compute msd up to a quarter of trajectory length
-    msd=motion.msd(df,
-                    mpp=1,
-                    fps=1,
-                    max_lagtime=max_lagtime,
-                    detail=detail,
-                    pos_columns=None,
-                    )
-    
-    msd=msd.msd # Get only mean square displacement, since aslo <x>, <x^2>, ... are computed
-    
-  
-    return msd
-
-#%%
 def fit_msd_free(lagtimes,msd,offset=False):
     '''
     
@@ -119,11 +94,14 @@ def fit_msd_free_iterative(lagtimes,msd,lp,max_it=5):
         
         ### Assign iteration and fitted track length
         s_out['p']=p[-1]
-        s_out['max_it']=i+1
+        s_out['max_it']=i
         
         ### Update optimal track length to be fitted
         try:
-            p=p+[int(np.ceil(2+2.7*x**0.5))]
+            p_update=int(np.ceil(2+2.7*x**0.5))
+            if p_update<=2:
+                p_update=2
+            p=p+[p_update]
         except:
             break
             
@@ -135,38 +113,38 @@ def fit_msd_free_iterative(lagtimes,msd,lp,max_it=5):
     return s_out
 
 #%%
-def getfit_msd(df,lp,offset=False):
+def getfit_msd(df,offset=False):
     '''
-    Calculate msd of single trjecory using get_msd and apply all fit methods.
+    Calculate msd of single trjecory using metrics.mean_displacement_moments() and apply all fit methods.
     '''
-    
+
     ### Get mean displacement moments
-    t0=time.time() # Timing
     moments=metrics.mean_displacement_moments(df.frame.values,
                                               df.x.values,
                                               df.y.values) 
     x=moments[:,0] # Define lagtimes, x values for fit
     y=moments[:,1] # Define msd, y values for fit
-    t_msd=time.time()-t0 # Timing
+
     
-    ### Try every fitting method
-    t0=time.time() # Timing
+    ### msd fit of 0.2*trajectory length assuming BM no offset
     s_free=fit_msd_free(x,y,offset=offset).rename({'a':'a_free','b':'b_free'})
+    ### msd fit of 0.2*trajectory according to anomalous diffusion
     s_anom=fit_msd_anomal(x,y).rename({'a':'a_anom','b':'b_anom'})
+    ### Iterative fit
+    lp=np.median(df.lpx**2+df.lpy**2) # Get localization precision as input for iterative fit
     s_iter=fit_msd_free_iterative(x,y,lp).rename({'a':'a_iter','b':'b_iter','p':'p_iter','max_it':'max_iter'})
-    t_fit=time.time()-t0
+
     
     ### Asign output series
     s_out=pd.concat([s_free,
                      s_anom,
                      s_iter,
-                     pd.Series({'t_msd':t_msd,'t_fit':t_fit}),
                      ])
     
     return s_out
 
 #%%
-def get_props(df,lp,offset=False):
+def get_props(df,offset=False):
     """ 
     Wrapper function to combine:
     
@@ -184,7 +162,7 @@ def get_props(df,lp,offset=False):
     # Call individual functions
     
     s_var=improps.get_var(df)
-    s_msd=getfit_msd(df,lp,offset)
+    s_msd=getfit_msd(df,offset)
         
     # Combine output
     s_out=pd.concat([s_var,s_msd])
@@ -193,19 +171,17 @@ def get_props(df,lp,offset=False):
 
 #%%
 def apply_props(df,
-                lp,
                 offset=False):
     """ 
           
     """
     tqdm.pandas() # For progressbar under apply
-    df_props = df.groupby('group').progress_apply(lambda df: get_props(df,lp,offset))
+    df_props = df.groupby('group').progress_apply(lambda df: get_props(df,offset))
     
     return df_props
 
 #%%
 def apply_props_dask(df,
-                     lp,
                      offset=False,
                      NoPartitions=30): 
     """
@@ -224,13 +200,55 @@ def apply_props_dask(df,
     df=dd.from_pandas(df,npartitions=NoPartitions) 
     
     ### Define apply_props for dask which will be applied to different partitions of df
-    def apply_props_2part(df,lp,offset): return df.groupby('group').apply(lambda df: get_props(df,lp,offset))
+    def apply_props_2part(df,offset): return df.groupby('group').apply(lambda df: get_props(df,offset))
     
     ### Map apply_props_2part to every partition of df for parallelized computing    
     with ProgressBar():
-        df_props=df.map_partitions(apply_props_2part,lp,offset).compute(scheduler='processes')
+        df_props=df.map_partitions(apply_props_2part,offset).compute(scheduler='processes')
     
     return df_props
+
+#%%
+
+def get_tracks_per_frame(props,info):
+    '''
+    Count number of trajectories per frame.
+    '''
+    ### Get number of frames in measurement
+    NoFrames=info[0]['Frames']
+    
+    ### Count number of tracks per frame
+    NoTracks=np.zeros(NoFrames)
+    print('Calculating number of tracks per frame...')
+    print('')
+    for f in range(NoFrames):
+        ### Trajectories with min_frame<=frame<=max_frame
+        positives=(props.min_frame<=f)&(props.max_frame>=f)
+        NoTracks[f]=np.sum(positives)
+    
+    return NoTracks
+
+#%%
+def fit_tracks_per_frame(NoTracks):
+    '''
+    
+    '''
+    y=NoTracks
+    N=len(y)
+    x=np.arange(0,N,1)
+    
+    if N>=3: # Try ftting if more than 2 points
+        ### Init start values
+        p0=[(y[-1]-y[0]),N/2,y[-1]] 
+        try:
+            popt,pcov=curve_fit(express.exp_tracks_per_frame,x,y,p0=p0)
+        except:
+            popt=np.full(3,np.nan)
+    else:
+        popt=np.full(3,np.nan)
+    
+    y_fit=express.exp_tracks_per_frame(x,*popt)
+    return [popt,x,y_fit]
 
 #%%
 def main(locs,info,**params):
@@ -286,21 +304,16 @@ def main(locs,info,**params):
     path=info[0]['File']
     path=os.path.splitext(path)[0]
     
-    ### Get median localization precision square for iterative fitting
-    lp=np.median(locs.lpx**2+locs.lpy**2)
-    
     ### Calculate kinetic properties
     print('Calculating kinetic information ...')
     if params['parallel']==True:
         print('... in parallel')
         locs_props=apply_props_dask(locs,
-                                    lp,
                                     params['offset'],
                                     NoPartitions=params['NoPartitions'],
                                     )
     else:
         locs_props=apply_props(locs,
-                               lp,
                                params['offset']
                                )
     # ### Filtering
