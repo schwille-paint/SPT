@@ -72,10 +72,10 @@ def get_taubs(df,ignore=1):
     return taubs,frames_start,taubs_photons,taubs_photons_err
 
 #%%
-def taubs_to_NgT(taubs,
-                 start_frames,
-                 taubs_photons,
-                 taubs_photons_err):
+def tracks_greaterT(track_length,
+                    track_start,
+                    track_photons,
+                    track_photons_std):
     '''
     Return number of bright times greater than Ts as array of len(Ts).
     '''
@@ -88,35 +88,35 @@ def taubs_to_NgT(taubs,
                        np.arange(5000,50001,1000)),axis=0)
     
     ### Init observables
-    NgT=np.zeros(len(Ts))
-    NgT_start=np.zeros(len(Ts))
-    NgT_photons=np.zeros(len(Ts))
-    NgT_photons_err=np.zeros(len(Ts))
+    gT=np.zeros(len(Ts))
+    gT_start=np.zeros(len(Ts))
+    gT_photons=np.zeros(len(Ts))
+    gT_photons_std=np.zeros(len(Ts))
     
     for idx,T in enumerate(Ts):
-        positives=taubs>=T # Which bright events are longer than T? -> positives
+        positives=track_length>=T # Which tracks are longer than T? -> positives
             
-        NgT[idx]=np.sum(positives) # How many positives
-        NgT_start[idx]=np.mean(start_frames[positives]) # When did positives start?
-        NgT_photons[idx]=np.mean(taubs_photons[positives]) # How bright were positives on average?
-        NgT_photons_err[idx]=np.mean(taubs_photons_err[positives]) # How much scatter positives in brightness on average?
+        gT[idx]=np.sum(positives) # How many positives
+        gT_start[idx]=np.mean(track_start[positives]) # When did positives start?
+        gT_photons[idx]=np.mean(track_photons[positives]) # How bright were positives on average?
+        gT_photons_std[idx]=np.mean(track_photons_std[positives]) # How much scatter positives in brightness on average?
         
     ### Prepare output
-    NgT=pd.Series(NgT)
-    NgT.index=['n%i'%(T) for T in Ts]
+    gT=pd.Series(gT)
+    gT.index=['n%i'%(T) for T in Ts]
     
-    NgT_start=pd.Series(NgT_start)
-    NgT_start.index=['s%i'%(T) for T in Ts]
+    gT_start=pd.Series(gT_start)
+    gT_start.index=['s%i'%(T) for T in Ts]
     
-    NgT_photons=pd.Series(NgT_photons)
-    NgT_photons.index=['p%i'%(T) for T in Ts]
+    gT_photons=pd.Series(gT_photons)
+    gT_photons.index=['p%i'%(T) for T in Ts]
     
-    NgT_photons_err=pd.Series(NgT_photons_err)
-    NgT_photons_err.index=['e%i'%(T) for T in Ts]
+    gT_photons_std=pd.Series(gT_photons_std)
+    gT_photons_std.index=['e%i'%(T) for T in Ts]
     
-    s_out=pd.concat([NgT,NgT_start,NgT_photons,NgT_photons_err])
+    s_out=pd.concat([gT,gT_start,gT_photons,gT_photons_std])
     
-    return s_out
+    return [s_out,Ts]
 
 #%%
 def get_NgT(df,ignore=1):
@@ -125,12 +125,12 @@ def get_NgT(df,ignore=1):
     '''
     
     taubs,start_frames,taubs_photons,taubs_photons_err=get_taubs(df,ignore)
-    NgT=taubs_to_NgT(taubs,
-                     start_frames,
-                     taubs_photons,
-                     taubs_photons_err)
+    gT=tracks_greaterT(taubs,
+                        start_frames,
+                        taubs_photons,
+                        taubs_photons_err)[0]
     
-    return NgT
+    return gT
     
 #%%
 def get_start(df,ignore):
@@ -206,11 +206,11 @@ def get_props(df,ignore=1):
     # Call individual functions
     s_var=get_var(df)
     s_start=get_start(df,[0,1,2,3,4,5])
-    s_NgT=get_NgT(df,ignore)
+    s_gT=get_NgT(df,ignore)
     
     
     # Combine output
-    s_out=pd.concat([s_var,s_start,s_NgT])
+    s_out=pd.concat([s_var,s_start,s_gT])
     
     return s_out
 

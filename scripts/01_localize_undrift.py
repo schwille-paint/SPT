@@ -10,10 +10,11 @@ import picasso_addon.localize as localize
 importlib.reload(localize)
 ############################################# Load raw data
 dir_names=[]
-dir_names.extend(['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-12-16_SLB_newstock_fix_vs_th/s2_LC+Str+40nM-R1S1-8_exp100_p114uW_1'])
+dir_names.extend(['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-12-16_SLB_newstock_fix_vs_th/s2_LC+Str+40nM-R1S1-8_exp100_p114uW_1']*2)
 
 file_names=[]
-file_names.extend(['s2_LC+Str+40nM-R1S1-8_exp100_p114uW_1_MMStack_Pos0.ome.tif'])
+file_names.extend(['s2_LC+Str+40nM-R1S1-8_exp100_p114uW_1_MMStack_Pos1.ome.tif'])
+file_names.extend(['s2_LC+Str+40nM-R1S1-8_exp100_p114uW_1_MMStack_Pos2.ome.tif'])
 
 ############################################ Set non standard parameters 
 ### Valid for all evaluations

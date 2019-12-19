@@ -1,33 +1,49 @@
 import numpy as np
 import pandas as pd
+from scipy.optimize import curve_fit
+
+import spt.analytic_expressions as express
 
 #%%
-def get_ecdf(x):
-    """
-    Calculate experimental continuous distribution function (ECDF) of random variable x
-    so that counts(value)=probability(x>=value). I.e last value of counts=1.
+def tracks_per_frame(props,info):
+    '''
+    Count number of trajectories per frame.
+    '''
+    ### Get number of frames in measurement
+    NoFrames=info[0]['Frames']
     
-    Equivalent to :
-        matplotlib.pyplot.hist(tau_dist,bins=numpy.unique(tau_dist),normed=True,cumulative=True)
+    ### Count number of tracks per frame
+    n_tracks=np.zeros(NoFrames)
+    print('Calculating number of tracks per frame...')
+    print('')
+    for f in range(NoFrames):
+        ### Trajectories with min_frame<=frame<=max_frame
+        positives=(props.min_frame<=f)&(props.max_frame>=f)
+        n_tracks[f]=np.sum(positives)
     
-    Parameters
-    ---------
-    x : numpy.ndarray
-        1 dimensional array of random variable  
-    Returns
-    -------
-    values : numpy.ndarray
-         Bins of ECDF corresponding to unique values of x.
-    counts : numpy.ndarray
-        counts(value)=probability(x<=value).
-    """
-    x=x[x>0]
-    values,counts=np.unique(x,return_counts=True) # Give unique values and counts in x
-    counts_leq=np.cumsum(counts) # Empirical cfd counts(X<=x)
-    counts_l=np.concatenate([[0],counts_leq[0:-1]]) # Empirical cfd counts(X<x)
-    counts_l = counts_l/counts_leq[-1] # normalize that sum(counts) = 1, i.e. now P(X<x)
-    counts_l_inv=1-counts_l # Empirical cfd inverse, i.e. P(X>=x)
-    return [values,counts_l_inv]
+    return n_tracks
+
+#%%
+def fit_tracks_per_frame(n_tracks):
+    '''
+    Fit number of trajectories per frame with deaying exponential
+    '''
+    y=n_tracks
+    N=len(y)
+    x=np.arange(0,N,1)
+    
+    if N>=3: # Try ftting if more than 2 points
+        ### Init start values
+        p0=[(y[-1]-y[0]),N/2,y[-1]] 
+        try:
+            popt,pcov=curve_fit(express.exp_tracks_per_frame,x,y,p0=p0)
+        except:
+            popt=np.full(3,np.nan)
+    else:
+        popt=np.full(3,np.nan)
+    
+    y_fit=express.exp_tracks_per_frame(x,*popt)
+    return [popt,x,y_fit]
 
 #%%
 def get_half_time(df):
@@ -38,12 +54,13 @@ def get_half_time(df):
     s_out=pd.Series(index=fields)
 
     for f in fields:
-        ecdf=get_ecdf(df.loc[:,f])
+        ecdf=express.ecdf(df.loc[:,f])
         half_idx=np.where(ecdf[1]>0.5)[0][-1]
         s_out[f]=ecdf[0][half_idx]
     
     s_out.index=['half_i%i'%(i) for i in range(0,6)]
     return  s_out
+
 
 #%%
 def get_NgT(df):

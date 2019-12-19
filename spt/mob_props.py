@@ -3,12 +3,9 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from scipy.optimize import curve_fit
-import time
-# import warnings
-# warnings.filterwarnings("ignore")
 
 import picasso_addon.io as addon_io
-import trackpy.motion as motion
+
 import spt.immobile_props as improps
 import spt.motion_metrics as metrics
 import spt.analytic_expressions as express
@@ -113,32 +110,50 @@ def fit_msd_free_iterative(lagtimes,msd,lp,max_it=5):
     return s_out
 
 #%%
-def getfit_msd(df,offset=False):
+def getfit_moments(df,offset=False):
     '''
     Calculate msd of single trjecory using metrics.mean_displacement_moments() and apply all fit methods.
     '''
 
-    ### Get mean displacement moments
-    moments=metrics.mean_displacement_moments(df.frame.values,
-                                              df.x.values,
-                                              df.y.values) 
-    x=moments[:,0] # Define lagtimes, x values for fit
-    y=moments[:,1] # Define msd, y values for fit
-
+    ### Get displacement moments
+    moments=metrics.displacement_moments(df.frame.values,
+                                         df.x.values,
+                                         df.y.values) 
     
-    ### msd fit of 0.2*trajectory length assuming BM no offset
-    s_free=fit_msd_free(x,y,offset=offset).rename({'a':'a_free','b':'b_free'})
-    ### msd fit of 0.2*trajectory according to anomalous diffusion
-    s_anom=fit_msd_anomal(x,y).rename({'a':'a_anom','b':'b_anom'})
+    
+    ### Get other metrics
+    meanmoment_ratio=np.median(moments[:,2]/moments[:,1]**2)
+    maxmoment_ratio=np.median(moments[:,4]/moments[:,3]**2)
+    msd_ratio=metrics.msd_ratio(moments)
+    straight=metrics.straightness(df.x.values,
+                                  df.y.values)
+    
+    s_other=pd.Series({'meanmoment_ratio':meanmoment_ratio,
+                       'maxmoment_ratio':maxmoment_ratio,
+                       'msd_ratio':msd_ratio,
+                       'straight':straight,
+                       })
+    
+    ### MSD fitting
+    x=moments[:,0] # Define lagtimes, x values for fit
+    y=moments[:,1] # Define MSD, y values for fit
+    ### Anomalous diffusion (0.25 length)
+    s_anom_msd=fit_msd_anomal(x,y).rename({'a':'a_anom','b':'b_anom'})
     ### Iterative fit
     lp=np.median(df.lpx**2+df.lpy**2) # Get localization precision as input for iterative fit
     s_iter=fit_msd_free_iterative(x,y,lp).rename({'a':'a_iter','b':'b_iter','p':'p_iter','max_it':'max_iter'})
-
+    
+    ### MME fitting
+    x=moments[:,0] # Define lagtimes, x values for fit
+    y=moments[:,3] # Define MME, y values for fit
+    ### Anomalous diffusion (0.25 length)
+    s_anom_mme=fit_msd_anomal(x,y).rename({'a':'a_mme_anom','b':'b_mme_anom'})
     
     ### Asign output series
-    s_out=pd.concat([s_free,
-                     s_anom,
+    s_out=pd.concat([s_other,
+                     s_anom_msd,
                      s_iter,
+                     s_anom_mme,
                      ])
     
     return s_out
@@ -162,7 +177,7 @@ def get_props(df,offset=False):
     # Call individual functions
     
     s_var=improps.get_var(df)
-    s_msd=getfit_msd(df,offset)
+    s_msd=getfit_moments(df,offset)
         
     # Combine output
     s_out=pd.concat([s_var,s_msd])
@@ -207,48 +222,6 @@ def apply_props_dask(df,
         df_props=df.map_partitions(apply_props_2part,offset).compute(scheduler='processes')
     
     return df_props
-
-#%%
-
-def get_tracks_per_frame(props,info):
-    '''
-    Count number of trajectories per frame.
-    '''
-    ### Get number of frames in measurement
-    NoFrames=info[0]['Frames']
-    
-    ### Count number of tracks per frame
-    NoTracks=np.zeros(NoFrames)
-    print('Calculating number of tracks per frame...')
-    print('')
-    for f in range(NoFrames):
-        ### Trajectories with min_frame<=frame<=max_frame
-        positives=(props.min_frame<=f)&(props.max_frame>=f)
-        NoTracks[f]=np.sum(positives)
-    
-    return NoTracks
-
-#%%
-def fit_tracks_per_frame(NoTracks):
-    '''
-    
-    '''
-    y=NoTracks
-    N=len(y)
-    x=np.arange(0,N,1)
-    
-    if N>=3: # Try ftting if more than 2 points
-        ### Init start values
-        p0=[(y[-1]-y[0]),N/2,y[-1]] 
-        try:
-            popt,pcov=curve_fit(express.exp_tracks_per_frame,x,y,p0=p0)
-        except:
-            popt=np.full(3,np.nan)
-    else:
-        popt=np.full(3,np.nan)
-    
-    y_fit=express.exp_tracks_per_frame(x,*popt)
-    return [popt,x,y_fit]
 
 #%%
 def main(locs,info,**params):
@@ -316,12 +289,6 @@ def main(locs,info,**params):
         locs_props=apply_props(locs,
                                params['offset']
                                )
-    # ### Filtering
-    # print('Filtering ..(%s)'%(params['filter']))
-    # params['NoGroups_nofilter']=len(locs_props) # Number of groups before filter
-    # locs_props=filter_(locs_props,NoFrames,params['filter']) # Apply filter
-    # params['NoGroups_filter']=len(locs_props) # Number of groups after filter
-
 
     print('Saving _tprops ...')
     info_props=info.copy()+[params]
