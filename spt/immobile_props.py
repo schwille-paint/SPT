@@ -187,6 +187,7 @@ def get_var(df):
     s_out['min_frame']=df['frame'].min()
     s_out['max_frame']=df['frame'].max()
     s_out['len']=s_out['max_frame']-s_out['min_frame']+1
+    s_out['n_locs']=len(df)
     
     return s_out
 
