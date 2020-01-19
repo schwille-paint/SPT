@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from scipy.optimize import curve_fit
+import importlib
 
 import picasso_addon.io as addon_io
 
@@ -10,6 +11,7 @@ import spt.immobile_props as improps
 import spt.motion_metrics as metrics
 import spt.analytic_expressions as express
 
+importlib.reload(metrics)
 
 #%%
 def fit_msd_free(lagtimes,msd,offset=False):

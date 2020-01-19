@@ -50,7 +50,7 @@ def get_half_time(df):
     '''
     Get half life time, i.e. 1-ecdf (means bigger than T) of start times for different ignore values.
     '''
-    fields=df.columns.values[11:17]
+    fields=['Tstart-i%i'%(i) for i in range(6)]
     s_out=pd.Series(index=fields)
 
     for f in fields:
@@ -67,7 +67,7 @@ def get_NgT(df):
     '''
     Return average and 25%/75% interquartile range of all NgT related values.
     '''
-    fields=df.columns.values[17:]
+    fields=df.columns.values[22:]
     NgT_mean=df.loc[:,fields].mean(axis=0)
     NgT_std=df.loc[:,fields].std()
     NgT_iqr50=df.loc[:,fields].quantile(0.50,axis=0)
@@ -80,7 +80,7 @@ def get_NgT(df):
                       '25%':NgT_iqr25,
                       '75%':NgT_iqr75})
     
-    Ts=NgT_stats.index.values[17:]
+    Ts=NgT_stats.index.values[22:]
     Ts=np.array([int(T[1:]) for T in Ts])
     Ts=np.unique(Ts)
     
@@ -100,11 +100,11 @@ def get_T_with_N(df):
     idx=['n%i'%(T) for T in Ts]
     N=NgT_stats.loc[idx,'mean']
     N.index=Ts
-    ### Starts, rip of n in index
+    ### Starts, rip of s in index
     idx=['s%i'%(T) for T in Ts]
     S=NgT_stats.loc[idx,'50%']
     S.index=Ts
-    ### Photons, rip of n in index
+    ### Photons, rip of p in index
     idx=['p%i'%(T) for T in Ts]
     P=NgT_stats.loc[idx,'50%']
     P.index=Ts

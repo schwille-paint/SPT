@@ -71,8 +71,8 @@ def straightness(x,y):
     ### Sum of steps
     stepsum=np.sum(np.sqrt(dx**2+dy**2))
     ### Total distance travelled
-    distance=np.sqrt((x[-1]-x[0])*2+(y[-1]-y[0])*2)
-    ### Straighness
+    distance=np.sqrt((x[-1]-x[0])**2+(y[-1]-y[0])**2)
+    ### Straightness
     if stepsum!=0:
         straightness=distance/stepsum
     else:
