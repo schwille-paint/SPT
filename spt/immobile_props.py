@@ -126,9 +126,9 @@ def get_NgT(df,ignore=1):
     
     taubs,start_frames,taubs_photons,taubs_photons_err=get_taubs(df,ignore)
     gT=tracks_greaterT(taubs,
-                        start_frames,
-                        taubs_photons,
-                        taubs_photons_err)[0]
+                       start_frames,
+                       taubs_photons,
+                       taubs_photons_err)[0]
     
     return gT
     
@@ -178,7 +178,10 @@ def get_var(df):
     ### Get all mean values
     s_out=df.mean()
     ### Set photon values to median
-    s_out[['photons','bg']]=df[['photons','bg']].median()
+    s_out['bg']=df['bg'].median()
+    phot_crit=np.percentile(df['photons'],99)
+    s_out['photons']=df.loc[df.photons>=phot_crit,'photons'].mean()
+    
     ### Set sx and sy to standard deviation in x,y (locs!) instead of mean of sx,sy (PSF width)
     s_out[['sx','sy',]]=df[['x','y']].std()
     ### Add std_photons
@@ -259,7 +262,12 @@ def filter_fix(df):
     """ 
     Filter for fixed single dye experiments    
     """            
+    ### Localization within first 5 frames condition
     istrue = df.min_frame<=5
+    
+    ### Number of events upper percentile cut
+    crit_nevents=np.percentile(df.n1,90) 
+    istrue = istrue & (df.n1<=crit_nevents)
     
     df_filter=df.loc[istrue,:]
 
@@ -289,7 +297,7 @@ def filter_(df,NoFrames,apply_filter=None):
     elif apply_filter==None:
         df_filter=df.copy()
     else:
-        print('No filter criterium chosen. Please choose fix,nofix,None')
+        print('No filter criterium chosen. Please choose fix,paint,None')
         sys.exit()
     
     return df_filter
