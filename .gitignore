@@ -4,7 +4,7 @@ __pycache__/
 /SPT.egg-info
 /build
 /dist
-/scripts
 .gitignore~
+.gitignore
 /.ipynb_checkpoints
-
+/scripts
