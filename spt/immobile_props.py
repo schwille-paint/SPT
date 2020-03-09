@@ -3,6 +3,10 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import sys
+import dask.dataframe as dd
+import multiprocessing as mp
+import time
+import hdbscan
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -195,6 +199,37 @@ def get_var(df):
     return s_out
 
 #%%
+def center_normdistance(centers,k):
+    
+    d_norm=(centers[k+1:]-centers[k:-1])/centers[k]
+    
+    return d_norm
+#%%
+def get_levels(df):
+    
+    ### Prepare data
+    data=df.net_gradient.values.reshape(-1,1)
+    data=data[np.random.randint(0,len(data),size=int(len(data)/2))]
+    ### We only define the minimum clustersize as input parameter to hdbscan
+    min_cluster_size=int(len(data)*0.02)
+    if min_cluster_size<50:
+        min_cluster_size=50
+    ### Cluster
+    clusterer = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size,
+                                allow_single_cluster=False,
+                                ).fit(data)
+    
+    cluster_id=clusterer.labels_ # Cluster ids
+    ### Get cluster centers, i.e. sorted medians (from lowest to highest ng value)
+    cluster_centers=[np.median(data[cluster_id==i]) for i in np.unique(cluster_id)[1:]]
+    cluster_centers.sort()
+    cluster_centers=np.asarray(cluster_centers)
+    ### Get cluster center distances normed to lowest cluster R0
+    dnorm0=center_normdistance(cluster_centers,0)
+    
+    return data,cluster_centers,dnorm0
+    
+#%%
 def get_props(df,ignore=1):
     """ 
     Wrapper function to combine:
@@ -233,29 +268,38 @@ def apply_props(df,
 
 #%%
 def apply_props_dask(df,
-                    ignore=1,
-                    NoPartitions=30): 
+                    ignore=1): 
     """
     Applies pick_props.get_props(df,NoFrames,ignore) to each group in parallelized manner using dask by splitting df into 
     various partitions.
     """
-    ########### Load packages
-#    import dask
-#    import dask.multiprocessing
-    import dask.dataframe as dd
-    from dask.diagnostics import ProgressBar
-    ########### Globally set dask scheduler to processes
-#    dask.config.set(scheduler='processes')
-#    dask.set_options(get=dask.multiprocessing.get)
-    ########### Partionate df using dask for parallelized computation
-    df=df.set_index('group') # Set group as index otherwise groups will be split during partition!!!
-    df=dd.from_pandas(df,npartitions=NoPartitions) 
-    ########### Define apply_props for dask which will be applied to different partitions of df
+    
+    ### Define groupby.apply function for dask which will be applied to different partitions of df
     def apply_props_2part(df,ignore): return df.groupby('group').apply(lambda df: get_props(df,ignore))
-    ########### Map apply_props_2part to every partition of df for parallelized computing    
-    with ProgressBar():
-        df_props=df.map_partitions(apply_props_2part,ignore).compute(scheduler='processes')
+    
+    t0=time.time() # Timing
+    ### Set up DataFrame for dask
+    df=df.set_index('group') # Set group as index otherwise groups will be split during partition!!! 
+    NoPartitions=max(1,int(0.7 * mp.cpu_count()))
+    df=dd.from_pandas(df,npartitions=NoPartitions)                
+        
+    ### Compute using running dask cluster, if no cluster is running dask will start one with default settings (maybe slow since not optimized for computation!)
+    df_props=df.map_partitions(apply_props_2part,ignore).compute()
+    dt=time.time()-t0
+    print('... Computation time %.1f s'%(dt)) 
     return df_props
+
+#%%
+def cluster_setup_howto():
+    print('Please first start a DASK LocalCluster by running following command in directly in IPython shell:')
+    print()
+    print('Client(n_workers=max(1,int(0.7 * mp.cpu_count())),')
+    print('       processes=True,')
+    print('       threads_per_worker=1,')
+    print('       scheduler_port=8787,')
+    print('       dashboard_address=":1234")')                  
+
+    return
 
 #%%
 def filter_fix(df):
@@ -316,8 +360,8 @@ def main(locs,info,**params):
     
     **kwargs: If not explicitly specified set to default, also when specified as None
         ignore(int=1):             Ignore value for bright frame
-        parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)
-        NoPartitions(int=30):      Number of partitions in case of parallel computing
+        parallel(bool=True):       Apply parallel computing using dask? 
+                                   Dask cluster should be set up and running for best performance!
         filter(string='paint'):    Which filter to use, either None, 'paint' or 'fix'
     
     return:
@@ -329,7 +373,6 @@ def main(locs,info,**params):
     ### Define standard 
     standard_params={'ignore':1,
                      'parallel':True,
-                     'NoPartitions':30,
                      'filter':'paint'
                      }
     ### Set standard if not contained in params
@@ -365,7 +408,6 @@ def main(locs,info,**params):
         print('... in parallel')
         locs_props=apply_props_dask(locs,
                                     ignore=params['ignore'],
-                                    NoPartitions=params['NoPartitions'],
                                     )
     else:
         locs_props=apply_props(locs,

@@ -1,6 +1,8 @@
 #Script to call picasso_addon.localize.main()
 import os
 import importlib
+from dask.distributed import Client
+import multiprocessing as mp
 
 import picasso.io as io
 import picasso_addon.localize as localize
@@ -13,12 +15,10 @@ importlib.reload(improps)
 
 ############################################# Load raw data
 dir_names=[]
-dir_names.extend(['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/20-03-02_pseries_fix_B23_rep/id140_B_exp200_p038uW_T23_1']*3)
+dir_names.extend(['directory to .ome.tif movie'])
 
 file_names=[]
-file_names.extend(['id140_B_exp200_p038uW_T23_1_MMStack_Pos0.ome.tif'])
-file_names.extend(['id140_B_exp200_p038uW_T23_1_MMStack_Pos1.ome.tif'])
-file_names.extend(['id140_B_exp200_p038uW_T23_1_MMStack_Pos2.ome.tif'])
+file_names.extend(['file_name'])
 
 
 ############################################ Set non standard parameters 
@@ -31,6 +31,13 @@ params_all={'undrift':False,
 
 ### Exceptions
 params_special={}
+
+############################################# Start dask parallel computing cluster 
+try:
+    client = Client('localhost:8787')
+    print('Connecting to existing cluster...')
+except OSError:
+    improps.cluster_setup_howto()
 
 #%%
 ############################################ Main loop                   
