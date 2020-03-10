@@ -54,3 +54,38 @@ def ecdf(x):
     counts_l_inv=1-counts_l # Empirical cfd inverse, i.e. P(X>=x)
     
     return [values,counts_l_inv]
+
+#%%
+def gauss_1D(x,x0,sigma,A):
+    '''
+    
+
+    Args:
+        x (TYPE): DESCRIPTION.
+        A (TYPE): DESCRIPTION.
+        x0 (TYPE): DESCRIPTION.
+        sigma (TYPE): DESCRIPTION.
+
+    Returns:
+        y (TYPE): DESCRIPTION.
+
+    '''
+    y=np.absolute(A)*np.exp(-(x-x0)**2/sigma**2)
+    
+    return y
+
+
+#%%
+def gauss_Ncomb(x,p,N):
+    
+    y=0
+    for i in range(N):
+        ### Version with least degrees of freedom
+        # y+=gauss_1D(x,(i+1)*p[0],np.sqrt(i+1)*p[1],p[2+i])
+        ### Allow x0 to be different to dx
+        # y+=gauss_1D(x,p[0]+i*p[1],np.sqrt(i+1)*p[2],p[3+i])
+        ### Allow power law spacing
+        y+=gauss_1D(x,p[0]*(i+1)**p[1],np.sqrt(i+1)*p[2],p[3+i])
+    return y
+    
+    

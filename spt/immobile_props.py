@@ -209,7 +209,7 @@ def get_levels(df):
     
     ### Prepare data
     data=df.net_gradient.values.reshape(-1,1)
-    data=data[np.random.randint(0,len(data),size=int(len(data)/2))]
+    # data=data[np.random.randint(0,len(data),size=int(len(data)/2))]
     ### We only define the minimum clustersize as input parameter to hdbscan
     min_cluster_size=int(len(data)*0.02)
     if min_cluster_size<50:
@@ -373,7 +373,7 @@ def main(locs,info,**params):
     ### Define standard 
     standard_params={'ignore':1,
                      'parallel':True,
-                     'filter':'paint'
+                     'filter':'paint',
                      }
     ### Set standard if not contained in params
     for key, value in standard_params.items():
@@ -421,6 +421,7 @@ def main(locs,info,**params):
 
 
     print('Saving _tprops ...')
+    locs_props.reset_index(inplace=True) # Write group index into separate column
     info_props=info.copy()+[params]
     addon_io.save_locs(path+extension+'.hdf5',
                        locs_props,
