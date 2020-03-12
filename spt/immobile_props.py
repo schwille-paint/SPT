@@ -6,7 +6,7 @@ import sys
 import dask.dataframe as dd
 import multiprocessing as mp
 import time
-import hdbscan
+# import hdbscan
 from scipy.optimize import curve_fit
 import warnings
 warnings.filterwarnings("ignore")
@@ -204,6 +204,7 @@ def get_var(df):
     return s_out
 
 #%%
+'''
 def cluster_levels(df):
     
     ### Prepare data
@@ -232,6 +233,7 @@ def cluster_levels(df):
     clusters=clusters[np.argsort(clusters[:,0]),:] # Sort after medians
 
     return data,clusters
+'''
 
 #%%
 def fit_Ncomb(x,y,centers_init,N):
