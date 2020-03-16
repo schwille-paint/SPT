@@ -457,7 +457,7 @@ def filter_(df,NoFrames,apply_filter=None):
         df_filter=filter_fix(df)
     elif apply_filter=='paint':
         df_filter=filter_nofix(df,NoFrames)
-    elif apply_filter==None:
+    elif apply_filter=='none':
         df_filter=df.copy()
     else:
         print('No filter criterium chosen. Please choose fix,paint,None')
@@ -493,6 +493,7 @@ def main(locs,info,**params):
     standard_params={'ignore':1,
                      'parallel':True,
                      'filter':'paint',
+                     'save_picked':False,
                      }
     ### Set standard if not contained in params
     for key, value in standard_params.items():
@@ -546,5 +547,24 @@ def main(locs,info,**params):
                        locs_props,
                        info_props,
                        mode='picasso_compatible')
-
-    return [params,locs_props]
+    
+    if params['save_picked']: # Save reduced _locs_picked file
+        ### Reduce _locs to remaining groups in _props
+        groups=locs_props.group.values
+        locs_filter=locs.query('group in @groups')
+        
+        ### Adjust file extension for saving
+        try: extension=info[-1]['extension']+'_filter'
+        except: extension='_locs_xxx_picked_filter'
+        params['extension']=extension
+        info_filter=info.copy()+[params]
+        
+        ### Save
+        addon_io.save_locs(path+extension+'.hdf5',
+                           locs_filter,
+                           info_filter,
+                           mode='picasso_compatible')
+    else:
+        locs_filter=locs.copy()
+        
+    return [params,locs_props,locs_filter]
