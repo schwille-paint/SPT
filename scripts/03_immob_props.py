@@ -1,5 +1,6 @@
 #Script to call spt.immobile_props.main()
 import os
+import traceback
 import importlib
 from dask.distributed import Client
 import multiprocessing as mp
@@ -11,15 +12,15 @@ importlib.reload(improps)
 
 ############################################# Load raw data
 dir_names=[]
-dir_names.extend(['directory to locs_render_picked file'])
+dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-16_immob-th_pseries_livecell\id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1'])
 
 file_names=[]
-file_names.extend(['file_name'])
+file_names.extend(['id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs_render_picked.hdf5'])
 
 
 ############################################ Set non standard parameters 
 ### Valid for all evaluations
-params_all={'filter':'paint'}
+params_all={}
 ## Exceptions
 params_special={}
 
@@ -39,20 +40,15 @@ for i in range(0,len(file_names)):
     params=params_all.copy()
     for key, value in params_special.items():
         params[key]=value[i]
+    
     ### Run main function
     try:
         locs,info=addon_io.load_locs(path)
-        out=improps.main(locs,info,**params)
-    except:
+        out=improps.main(locs,info,path,**params)
+    except Exception:
+        traceback.print_exc()
         failed_path.extend([path])
 
 print()    
 print('Failed attempts: %i'%(len(failed_path)))
 
-
-#%%
-
-### Query _picked for groups in _props
-groups=out[1].index.values
-locs_filter=locs.query('group in @groups')
-filter_groups=locs_filter.group.unique()
