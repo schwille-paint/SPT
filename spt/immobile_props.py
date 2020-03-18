@@ -399,7 +399,7 @@ def apply_props_dask(df,
     t0=time.time() # Timing
     ### Set up DataFrame for dask
     df=df.set_index('group') # Set group as index otherwise groups will be split during partition!!! 
-    NoPartitions=max(1,int(0.7 * mp.cpu_count()))
+    NoPartitions=max(1,int(0.8 * mp.cpu_count()))
     df=dd.from_pandas(df,npartitions=NoPartitions)                
         
     ### Compute using running dask cluster, if no cluster is running dask will start one with default settings (maybe slow since not optimized for computation!)
@@ -412,7 +412,7 @@ def apply_props_dask(df,
 def cluster_setup_howto():
     print('Please first start a DASK LocalCluster by running following command in directly in IPython shell:')
     print()
-    print('Client(n_workers=max(1,int(0.7 * mp.cpu_count())),')
+    print('Client(n_workers=max(1,int(0.8 * mp.cpu_count())),')
     print('       processes=True,')
     print('       threads_per_worker=1,')
     print('       scheduler_port=8787,')
