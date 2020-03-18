@@ -467,7 +467,7 @@ def filter_(df,NoFrames,apply_filter=None):
 
 
 #%%
-def main(locs,info,**params):
+def main(locs,info,path,**params):
     '''
     Cluster detection (pick) in localization list by thresholding in number of localizations per cluster.
     Cluster centers are determined by creating images of localization list with set oversampling.
@@ -488,6 +488,10 @@ def main(locs,info,**params):
         list[1](pandas.DataFrame): Kinetic properties of all groups.
                                    Will be saved with extension '_picked_tprops.hdf5' for usage in picasso.filter
     '''
+    
+    ### Path of file that is processed and number of frames
+    path=os.path.splitext(path)[0]
+    NoFrames=info[0]['Frames']
     
     ### Define standard 
     standard_params={'ignore':1,
@@ -512,17 +516,10 @@ def main(locs,info,**params):
         del params[key]
         
     ### Procsessing marks: extension&generatedby
-    try: extension=info[-1]['extension']+'_tprops'
-    except: extension='_locs_xxx_picked_tprops'
-    params['extension']=extension
     params['generatedby']='spt.immobile_props.main()'
     
-    ### Get path of and number of frames
-    path=info[0]['File']
-    path=os.path.splitext(path)[0]
-    NoFrames=info[0]['Frames']
     
-    ### Calculate kinetic properties
+    ##################################### Calculate kinetic properties
     print('Calculating kinetic information ...')
     if params['parallel']==True:
         print('... in parallel')
@@ -533,34 +530,33 @@ def main(locs,info,**params):
         locs_props=apply_props(locs,
                                     ignore=params['ignore'],
                                     )
-    ### Filtering
+        
+    ##################################### Filtering
     print('Filtering ..(%s)'%(params['filter']))
     params['NoGroups_nofilter']=len(locs_props) # Number of groups before filter
     locs_props=filter_(locs_props,NoFrames,params['filter']) # Apply filter
     params['NoGroups_filter']=len(locs_props) # Number of groups after filter
 
-
+    ##################################### Saving
     print('Saving _tprops ...')
     locs_props.reset_index(inplace=True) # Write group index into separate column
     info_props=info.copy()+[params]
-    addon_io.save_locs(path+extension+'.hdf5',
+    addon_io.save_locs(path+'_tprops.hdf5',
                        locs_props,
                        info_props,
                        mode='picasso_compatible')
     
-    if params['save_picked']: # Save reduced _locs_picked file
+    
+    ##################################### Optional saving of reduced _locs_picked file
+    if params['save_picked']: 
         ### Reduce _locs to remaining groups in _props
         groups=locs_props.group.values
         locs_filter=locs.query('group in @groups')
         
-        ### Adjust file extension for saving
-        try: extension=info[-1]['extension']+'_filter'
-        except: extension='_locs_xxx_picked_filter'
-        params['extension']=extension
         info_filter=info.copy()+[params]
         
         ### Save
-        addon_io.save_locs(path+extension+'.hdf5',
+        addon_io.save_locs(path+'_valid.hdf5',
                            locs_filter,
                            info_filter,
                            mode='picasso_compatible')

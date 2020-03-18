@@ -1,5 +1,6 @@
 #Script to call picasso_addon.localize.main()
 import os
+import traceback
 import importlib
 from dask.distributed import Client
 import multiprocessing as mp
@@ -15,10 +16,10 @@ importlib.reload(improps)
 
 ############################################# Load raw data
 dir_names=[]
-dir_names.extend(['directory to .ome.tif movie'])
+dir_names.extend([r'C:\Data\p06.SP-tracking\20-03-11_pseries_fix_B21_rep\id140_B_exp200_p114uW_T21_1\test'])
 
 file_names=[]
-file_names.extend(['file_name'])
+file_names.extend(['id140_B_exp200_p114uW_T21_1_MMStack_Pos0.ome.tif'])
 
 
 ############################################ Set non standard parameters 
@@ -26,7 +27,6 @@ file_names.extend(['file_name'])
 params_all={'undrift':False,
             'min_n_locs':5,
             'filter':'fix',
-            #'parallel':False,
             }
 
 ### Exceptions
@@ -53,24 +53,28 @@ for i in range(0,len(file_names)):
         
     ### Run main function
     try:
-        ### Localize and undrift
+        ### Load movie
         movie,info=io.load_movie(path)
-        out=localize.main(movie,info,**params)
-        info=info+[out[0][0]]+[out[1][0]] # Update info to used params
+        
+        ### Localize and undrift
+        out=localize.main(movie,info,path,**params)
+        info=info+[out[0]] # Update info to used params
+        path=out[-1] # Update path
         
         ### Autopick
         print()
-        locs=out[1][1]
-        out=autopick.main(locs,info,**params)
+        locs=out[1]
+        out=autopick.main(locs,info,path,**params)
         info=info+[out[0]] # Update info to used params
+        path=out[-1] # Update path
         
         ### Immobile kinetics analysis
         print()
-        locs=out[2]
-        out=improps.main(locs,info,**params)
-        info=info+[out[0]] # Update info to used params
+        locs=out[1]
+        out=improps.main(locs,info,path,**params)
         
-    except:
+    except Exception:
+        traceback.print_exc()
         failed_path.extend([path])
 
 print()    
