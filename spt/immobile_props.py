@@ -16,11 +16,10 @@ import spt.analytic_expressions as express
 
 
 #%%
-def get_trace(df,NoFrames):
+def get_trace(df,NoFrames,field='net_gradient'):
     '''
     Get intensity vs time trace of length=NoFrames for group.
     '''
-    field='net_gradient'
     
     df[field]=df[field].abs() # Get absolute values of field
     df_sum=df[['frame',field]].groupby('frame').sum() # Sum multiple localizations in single frame
@@ -130,7 +129,7 @@ def tracks_greaterT(track_length,
 #%%
 def get_NgT(df,ignore=1):
     '''
-    Combine get_taubs and taubs_to_NgT to return NgT as pd.Series.
+    Combine get_taubs and taubs_to_NgT to return NgT as pd.Series. Additionaly return longest trajectory in trace as tau_max.
     '''
     
     taubs,start_frames,taubs_photons,taubs_photons_err=get_taubs(df,ignore)
@@ -139,7 +138,10 @@ def get_NgT(df,ignore=1):
                        taubs_photons,
                        taubs_photons_err)[0]
     
-    return gT
+    tau_max=pd.Series({'tau_max':np.max(taubs)})
+    s_out=pd.concat([tau_max,gT])
+    
+    return s_out
     
 #%%
 def get_start(df,ignore):
@@ -186,10 +188,9 @@ def get_var(df):
     '''
     ### Get all mean values
     s_out=df.mean()
-    ### Set photon values to median
+    ### Set photon and bg values to median
     s_out['bg']=df['bg'].median()
-    phot_crit=np.percentile(df['photons'],99)
-    s_out['photons']=df.loc[df.photons>=phot_crit,'photons'].mean()
+    s_out['photons']=df['photons'].median()
     
     ### Set sx and sy to standard deviation in x,y (locs!) instead of mean of sx,sy (PSF width)
     s_out[['sx','sy',]]=df[['x','y']].std()
@@ -202,38 +203,6 @@ def get_var(df):
     s_out['n_locs']=len(df)
     
     return s_out
-
-#%%
-'''
-def cluster_levels(df):
-    
-    ### Prepare data
-    data=df.net_gradient.values # Net gradient instead of photons yields levels with lower spread
-    
-    data=data[data<np.percentile(data,99)] # Cut off highest 0.5% values
-    data=data.reshape(-1,1)
-    
-    ### We only define the minimum clustersize as input parameter to hdbscan
-    min_cluster_size=int(len(data)*0.02)
-    if min_cluster_size<50:
-        min_cluster_size=50
-   
-    ### Cluster
-    clusterer = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size,
-                                allow_single_cluster=False,
-                                ).fit(data)
-    
-    cluster_id=clusterer.labels_ # Cluster ids
-    
-    ### Get cluster centers and sizes, i.e. sorted after medians (from lowest to highest ng value)
-    cluster_centers=np.asarray([np.median(data[cluster_id==i]) for i in np.unique(cluster_id)[1:]]) # Medians
-    cluster_size=np.asarray([len(data[cluster_id==i]) for i in np.unique(cluster_id)[1:]]) # Sizes
-    clusters=np.vstack([cluster_centers,cluster_size]).T
-    
-    clusters=clusters[np.argsort(clusters[:,0]),:] # Sort after medians
-
-    return data,clusters
-'''
 
 #%%
 def fit_Ncomb(x,y,centers_init,N):
@@ -281,7 +250,6 @@ def fit_Ncomb(x,y,centers_init,N):
     except:
         levels[0]=N
         levels[1]=np.nan # set chi to nan
-        levels[2:2+len(p0)]=np.zeros(len(p0)) # set popt to zeros
         return levels
    
     ### Remove peaks outside of data range
@@ -476,12 +444,14 @@ def main(locs,info,path,**params):
     args:
         locs(pd.Dataframe):        Picked localizations as created by picasso render
         info(list(dict)):          Info to picked localizations
-    
+        path(str):                 Path to _picked.hdf5 file.
+        
     **kwargs: If not explicitly specified set to default, also when specified as None
         ignore(int=1):             Ignore value for bright frame
         parallel(bool=True):       Apply parallel computing using dask? 
                                    Dask cluster should be set up and running for best performance!
         filter(string='paint'):    Which filter to use, either None, 'paint' or 'fix'
+        save_picked(bool=False):   If true _picked file containing just groups that passed filter will be saved under _picked_valid
     
     return:
         list[0](dict):             Dict of **kwargs passed to function.

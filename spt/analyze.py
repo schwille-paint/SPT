@@ -3,15 +3,13 @@ import pandas as pd
 from scipy.optimize import curve_fit
 
 import spt.analytic_expressions as express
+import spt.immobile_props as improps
 
 #%%
-def tracks_per_frame(props,info):
+def tracks_per_frame(props,NoFrames):
     '''
     Count number of trajectories per frame.
     '''
-    ### Get number of frames in measurement
-    NoFrames=info[0]['Frames']
-    
     ### Count number of tracks per frame
     n_tracks=np.zeros(NoFrames)
     print('Calculating number of tracks per frame...')
@@ -34,16 +32,82 @@ def fit_tracks_per_frame(n_tracks):
     
     if N>=3: # Try ftting if more than 2 points
         ### Init start values
-        p0=[(y[-1]-y[0]),N/2,y[-1]] 
+        p0=[np.median(y[-11:-1]),N] 
         try:
             popt,pcov=curve_fit(express.exp_tracks_per_frame,x,y,p0=p0)
         except:
-            popt=np.full(3,np.nan)
+            popt=np.full(2,np.nan)
     else:
-        popt=np.full(3,np.nan)
+        popt=np.full(2,np.nan)
     
     y_fit=express.exp_tracks_per_frame(x,*popt)
-    return [popt,x,y_fit]
+    return [x,y_fit,popt]
+
+#%%
+def get_mobile_props(df_in,infos):
+    '''
+    
+    '''
+    expID=df_in.index.levels[0].values
+    
+    df_list=[]
+    track_list=[]
+    gT_list=[]
+    result_list=[]
+    
+    for i in expID:
+        df=df_in.loc[(expID[i],slice(None)),:]
+        
+        ### 1) Filter for 'stuck' particles
+        istrue=(df.sx**2+df.sx**2)>(np.median(df.lpx*2+df.lpy**2)*10) # Spatial filter
+        df=df[istrue]
+        df_list.extend([df]) # Assign to list
+        
+        ### 2) No. of tracks per frame and fit
+        n_tracks=tracks_per_frame(df,infos[i][0]['Frames']) # Get tracks per frame
+        fit=fit_tracks_per_frame(n_tracks) # Fit exponential
+        track=[fit[0],n_tracks,fit[1],fit[2]] # x,y,y_fit,popt
+        track_list.extend([track]) # Assign to list
+        
+        ### 3) NgT
+        gT,Ts=improps.tracks_greaterT(df.len,
+                                      df.min_frame,
+                                      df.photons,
+                                      df.std_photons)
+        
+        ### 4) Normalization of NgT to inital track number
+        idx=['n%i'%(T) for T in Ts]
+        gT[idx]=gT[idx]/track[-1][0]
+        gT_list.extend([gT])
+        
+        ### 5) Get critical values
+        Ns=gT[idx].values
+        T_half=Ts[Ns>=0.5][-1] # Half time value
+        photons_half=gT['p%i'%(T_half)] # Median photons of tracks longer than half time value
+        tracks_init=track[-1][0] # Initial number of tracks
+        tracks_loss=track[-1][1] # Loss of tracks per frame
+        result=pd.Series({'T_half':T_half,
+                          'photons_half':photons_half,
+                          'tracks_init':tracks_init,
+                          'tracks_loss':tracks_loss,
+                          })
+        result_list.extend([result])
+        
+    ### Re-concatenate dfs
+    df_out=pd.concat([df for df in df_list])
+    
+    ### Combine gT Series to DataFrame
+    gT_out=pd.DataFrame([gT for gT in gT_list])
+    gT_out.index.name='expID'
+    Ts=gT_out.columns.values
+    Ts=list(np.unique([int(T[1:]) for T in Ts]))
+    gT_out.loc['T',:]=Ts*4
+    
+    ### Combine result Series to DataFrame
+    results=pd.DataFrame([result for result in result_list])
+    result.index.name='expID'
+    
+    return df_out, results, track_list, gT_out
 
 #%%
 def get_half_time(df):
@@ -67,7 +131,7 @@ def get_NgT(df):
     '''
     Return average and 25%/75% interquartile range of all NgT related values.
     '''
-    fields=df.columns.values[22:]
+    fields=df.columns.values[24:]
     NgT_mean=df.loc[:,fields].mean(axis=0)
     NgT_std=df.loc[:,fields].std()
     NgT_iqr50=df.loc[:,fields].quantile(0.50,axis=0)

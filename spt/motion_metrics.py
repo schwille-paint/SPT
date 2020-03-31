@@ -8,7 +8,7 @@ def displacement_moments(t,x,y):
 
     '''
     N=t[-1]-t[0]+1 # Trajectory length
-    max_lag=int(np.floor(0.25*N)) # Set maximum lagtime to 0.2*trajectory length
+    max_lag=int(np.floor(0.25*N)) # Set maximum lagtime to 0.25*trajectory length
     
     ### Create nan arrays of length N to distribute x,y and fill gaps with nans
     x_gap=np.ones(N)*np.nan
@@ -36,6 +36,8 @@ def displacement_moments(t,x,y):
         moments[l,2]=np.nanmean(r4_l)
         
         ### Update rXmax_leql to maximum of past steps and current
+        ### rXmax_leql will be always shortened 
+        ### to the size of rX_l while going through the loop!
         r2max_leql=np.maximum(r2max_leql[:-1],r2_l)
         r4max_leql=np.maximum(r4max_leql[:-1],r4_l)
         

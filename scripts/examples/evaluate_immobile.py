@@ -11,7 +11,7 @@ import picasso_addon.io as io
 import spt.analyze as analyze
 import spt.analytic_expressions as anexpress
 importlib.reload(analyze)
-plt.style.use('~/lbFCS/styles/paper.mplstyle')
+# plt.style.use('~/lbFCS/styles/paper.mplstyle')
 
 ############################################################## Parameters
 save_results=True
@@ -21,10 +21,10 @@ savename=os.path.splitext(os.path.basename(sys.argv[0]))[0]
 
 ############################################################## Define data
 dir_names=[]
-dir_names.extend(['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/20-01-16_immob-th_pseries_livecell/id169_R1-54#_R1s1-8_40nM_exp200_p038uW_1/20-01-16_JS'])
+dir_names.extend([r'C:\Users\flori\Documents\data\SPT\mobile\th\L21_exp200_p038uW'])
 
 file_names=[]
-file_names.extend(['id169_R1-54#_R1s1-8_40nM_exp200_p038uW_1_MMStack_Pos0.ome_locs_render_picked_tprops.hdf5'])
+file_names.extend([r'slb_id169_R1-54#_R1s1-8_40nM_exp200_p038uW_T21_1_MMStack_Pos0.ome_locs_picked0503_tmobprops.hdf5'])
 
 ############################################################## Read in data
 #### Create list of paths

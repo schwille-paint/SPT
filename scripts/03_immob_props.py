@@ -20,7 +20,9 @@ file_names.extend(['id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos0.om
 
 ############################################ Set non standard parameters 
 ### Valid for all evaluations
-params_all={}
+params_all={'filter':'none',
+            }
+
 ## Exceptions
 params_special={}
 

@@ -13,10 +13,10 @@ importlib.reload(mobprops)
 
 ############################################# Load raw data
 dir_names=[]
-dir_names.extend(['//fs/pool/pool-schwille-paint/Data/p06.SP-tracking/19-12-16_SLB_newstock_fix_vs_th/s2_LC+Str+40nM-R1S1-8_exp100_p114uW_1/19-12-18_FS'])
+dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_th_slb_L_T21\slb_id169_R1-54#_R1s1-8_40nM_exp200_p038uW_T21_1'])
 
 file_names=[]
-file_names.extend(['s2_LC+Str+40nM-R1S1-8_exp100_p114uW_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p038uW_T21_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
 
 
 #%%
@@ -32,8 +32,9 @@ importlib.reload(mobprops)
 importlib.reload(metrics)
 
 ### Select group
-g=102
+g=137
 
+g=locs.group.unique()[g]
 ### Track
 df=locs[locs.group==g]
 
@@ -43,8 +44,6 @@ moments=metrics.displacement_moments(df.frame.values,
                                      df.y.values)
 
     
-
-
 ########################################## Plotting
 
 ########################################## Plot traces
@@ -82,26 +81,4 @@ ax.plot(x,
         '-',
         c='b',
         label='MME')
-ax.legend()
-
-########################################## Plot MSD and MME ratios
-f=plt.figure(num=3,figsize=[4,3])
-f.subplots_adjust(left=0.2,right=0.95,bottom=0.2,top=0.95)
-f.clear()
-ax=f.add_subplot(111)
-y=moments[:,2]/moments[:,1]**2
-ax.plot(x,
-        y,
-        '-',
-        c='r',
-        label='MSD ratio')
-ax.axhline(np.mean(y),c='r')
-
-y=moments[:,4]/moments[:,3]**2
-ax.plot(x,
-        y,
-        '-',
-        c='b',
-        label='MME ratio')
-ax.axhline(np.mean(y),c='b')
 ax.legend()

@@ -12,7 +12,8 @@ import spt.immobile_props as immobprops
 
 importlib.reload(analyze)
 importlib.reload(immobprops)
-plt.style.use('~/lbFCS/styles/paper.mplstyle')
+# plt.style.use('~/lbFCS/styles/paper.mplstyle')
+
 #%%
 ############################################################## Parameters
 savedir='/fs/pool/pool-schwille-paint/Analysis/p06.SP-tracking/mobile/z.plots'
@@ -20,14 +21,10 @@ savename=os.path.splitext(os.path.basename(sys.argv[0]))[0]
 
 ############################################################## Define data
 dir_names=[]
-dir_names.extend(['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/20-01-16_th_slb_L_T21/slb_id169_R1-54#_R1s1-8_40nM_exp200_p038uW_T21_1'])
-dir_names.extend(['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/20-01-16_th_slb_L_T21/slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1'])
-dir_names.extend(['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/20-01-16_th_slb_L_T21/slb_id169_R1-54#_R1s1-8_40nM_exp200_p250uW_T21_1'])
+dir_names.extend([r'C:\Users\flori\Documents\data\SPT\mobile\th\L21_exp200_p038uW'])
 
 file_names=[]
-file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p038uW_T21_1_MMStack_Pos0.ome_locs_picked0503_tmobprops.hdf5'])
-file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs_picked0503_tmobprops.hdf5'])
-file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p250uW_T21_1_MMStack_Pos0.ome_locs_picked0503_tmobprops.hdf5'])
+file_names.extend([r'slb_id169_R1-54#_R1s1-8_40nM_exp200_p038uW_T21_1_MMStack_Pos0.ome_locs_picked0503_tmobprops.hdf5'])
 
 ############################################################## Read in data
 #### Create list of paths
@@ -37,7 +34,8 @@ labels=[i for i in range(0,len(path))]
 locs_props=pd.concat([io.load_locs(p)[0] for p in path],keys=labels,names=['rep'])
 infos=[io.load_locs(p)[1] for p in path]
 
-CycleTime=float(savename.split('_')[3][3:])*1e-3
+# CycleTime=float(savename.split('_')[3][3:])*1e-3
+CycleTime=0.2
 px=0.13 # px size in microns
 
 ############################################################## Inspect dataset
@@ -52,7 +50,7 @@ popt,frames,n_tracks_fit=analyze.fit_tracks_per_frame(n_tracks)
 X=locs_props.loc[(rep,slice(None)),:].copy()
 istrue=(X.sx**2+X.sy**2)>(np.median(X.lpx*2+X.lpy**2)*10) # Spatial filter
 X=X[istrue]
-istrue=X.n_locs>1000 # Track length filter
+istrue=X.n_locs>50 # Track length filter
 X=X[istrue]
 
 ### Tracks longer than T properties

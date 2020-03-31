@@ -19,11 +19,11 @@ def msd_anomal(tau,a,b):
     return msd
 
 #%%
-def exp_tracks_per_frame(x,a,b,c):
+def exp_tracks_per_frame(x,a,b):
     '''
     Exponential like decay to fit number of tracks per frame: NoTracks=a*np.exp(-x/b)+c
     '''
-    NoTracks=a*np.exp(-x/b)+c
+    NoTracks=a*np.exp(-x/b)
     return NoTracks
 
 #%%

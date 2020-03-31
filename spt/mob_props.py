@@ -4,6 +4,9 @@ import pandas as pd
 from tqdm import tqdm
 from scipy.optimize import curve_fit
 import importlib
+import dask.dataframe as dd
+import multiprocessing as mp
+import time
 
 import picasso_addon.io as addon_io
 
@@ -112,7 +115,7 @@ def fit_msd_free_iterative(lagtimes,msd,lp,max_it=5):
     return s_out
 
 #%%
-def getfit_moments(df,offset=False):
+def getfit_moments(df):
     '''
     Calculate msd of single trjecory using metrics.mean_displacement_moments() and apply all fit methods.
     '''
@@ -123,9 +126,9 @@ def getfit_moments(df,offset=False):
                                          df.y.values) 
     
     
-    ### Get other metrics
-    meanmoment_ratio=np.median(moments[:,2]/moments[:,1]**2)
-    maxmoment_ratio=np.median(moments[:,4]/moments[:,3]**2)
+    ### Get some metrics
+    meanmoment_ratio=np.median(moments[:,2]/(moments[:,1]**2))
+    maxmoment_ratio=np.median(moments[:,4]/(moments[:,3]**2))
     msd_ratio=metrics.msd_ratio(moments)
     straight=metrics.straightness(df.x.values,
                                   df.y.values)
@@ -136,19 +139,22 @@ def getfit_moments(df,offset=False):
                        'straight':straight,
                        })
     
-    ### MSD fitting
+    ########################## MSD fitting
     x=moments[:,0] # Define lagtimes, x values for fit
     y=moments[:,1] # Define MSD, y values for fit
+    
     ### Anomalous diffusion (0.25 length)
     s_anom_msd=fit_msd_anomal(x,y).rename({'a':'a_anom','b':'b_anom'})
+    
     ### Iterative fit
     lp=np.median(df.lpx**2+df.lpy**2) # Get localization precision as input for iterative fit
     s_iter=fit_msd_free_iterative(x,y,lp).rename({'a':'a_iter','b':'b_iter','p':'p_iter','max_it':'max_iter'})
     
-    ### MME fitting
+    ########################## MME fitting
     x=moments[:,0] # Define lagtimes, x values for fit
     y=moments[:,3] # Define MME, y values for fit
-    ### Anomalous diffusion (0.25 length)
+    
+    ## Anomalous diffusion (0.25 length)
     s_anom_mme=fit_msd_anomal(x,y).rename({'a':'a_mme_anom','b':'b_mme_anom'})
     
     ### Asign output series
@@ -161,7 +167,7 @@ def getfit_moments(df,offset=False):
     return s_out
 
 #%%
-def get_props(df,offset=False):
+def get_props(df):
     """ 
     Wrapper function to combine:
     
@@ -179,7 +185,7 @@ def get_props(df,offset=False):
     # Call individual functions
     
     s_var=improps.get_var(df)
-    s_msd=getfit_moments(df,offset)
+    s_msd=getfit_moments(df)
         
     # Combine output
     s_out=pd.concat([s_var,s_msd])
@@ -187,46 +193,39 @@ def get_props(df,offset=False):
     return s_out
 
 #%%
-def apply_props(df,
-                offset=False):
+def apply_props(df):
     """ 
           
     """
     tqdm.pandas() # For progressbar under apply
-    df_props = df.groupby('group').progress_apply(lambda df: get_props(df,offset))
+    df_props = df.groupby('group').progress_apply(get_props)
     
     return df_props
 
 #%%
-def apply_props_dask(df,
-                     offset=False,
-                     NoPartitions=30): 
+def apply_props_dask(df): 
     """
-    Applies mob_props.get_props(df,NoFrames,ignore) to each group in parallelized manner using dask by splitting df into 
+    Applies pick_props.get_props(df,NoFrames,ignore) to each group in parallelized manner using dask by splitting df into 
     various partitions.
     """
-    ### Load packages
-    import dask.dataframe as dd
-    from dask.diagnostics import ProgressBar
-    # from dask.distributed import Client
     
-    # client = Client(n_workers=30, threads_per_worker=1, processes=False, memory_limit='2GB')
+    ### Define groupby.apply function for dask which will be applied to different partitions of df
+    def apply_props_2part(df): return df.groupby('group').apply(get_props)
     
-    ### Prepare dask.DataFrame
-    df=df.set_index('group') # Set group as index otherwise groups will be split during partition!!!
-    df=dd.from_pandas(df,npartitions=NoPartitions) 
-    
-    ### Define apply_props for dask which will be applied to different partitions of df
-    def apply_props_2part(df,offset): return df.groupby('group').apply(lambda df: get_props(df,offset))
-    
-    ### Map apply_props_2part to every partition of df for parallelized computing    
-    with ProgressBar():
-        df_props=df.map_partitions(apply_props_2part,offset).compute(scheduler='processes')
-    
+    t0=time.time() # Timing
+    ### Set up DataFrame for dask
+    df=df.set_index('group') # Set group as index otherwise groups will be split during partition!!! 
+    NoPartitions=max(1,int(0.8 * mp.cpu_count()))
+    df=dd.from_pandas(df,npartitions=NoPartitions)                
+        
+    ### Compute using running dask cluster, if no cluster is running dask will start one with default settings (maybe slow since not optimized for computation!)
+    df_props=df.map_partitions(apply_props_2part).compute()
+    dt=time.time()-t0
+    print('... Computation time %.1f s'%(dt)) 
     return df_props
 
 #%%
-def main(locs,info,**params):
+def main(locs,info,path,**params):
     '''
     Cluster detection (pick) in localization list by thresholding in number of localizations per cluster.
     Cluster centers are determined by creating images of localization list with set oversampling.
@@ -235,23 +234,23 @@ def main(locs,info,**params):
     args:
         locs(pd.Dataframe):        Picked localizations as created by picasso render
         info(list(dict)):          Info to picked localizations
-    
+        path(str):                 Path to _picked.hdf5 file.
+        
     **kwargs: If not explicitly specified set to default, also when specified as None
-        ignore(int=1):             Ignore value for bright frame
         parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)
-        NoPartitions(int=30):      Number of partitions in case of parallel computing
-        filter(string='paint'):    Which filter to use, either None, 'paint' or 'fix'
     
     return:
         list[0](dict):             Dict of **kwargs passed to function.
         list[1](pandas.DataFrame): Kinetic properties of all groups.
                                    Will be saved with extension '_picked_tprops.hdf5' for usage in picasso.filter
     '''
+    ##################################### Params and file handling
+    
+    ### Path of file that is processed and number of frames
+    path=os.path.splitext(path)[0]
     
     ### Define standard 
-    standard_params={'offset':False,
-                     'parallel':True,
-                     'NoPartitions':30,
+    standard_params={'parallel':True,
                      }
     ### Set standard if not contained in params
     for key, value in standard_params.items():
@@ -269,34 +268,24 @@ def main(locs,info,**params):
     for key in delete_key:
         del params[key]
       
-    ### Processing marks: extension&generatedby
-    try: extension=info[-1]['extension']+'_tmobprops'
-    except: extension='_locs_pickedxxxx_tmobprops'
-    params['extension']=extension
+    ### Processing marks
     params['generatedby']='spt.mob_props.main()'
     
-    ### Get path of and number of frames
-    path=info[0]['File']
-    path=os.path.splitext(path)[0]
     
-    ### Calculate kinetic properties
+    ##################################### Calculate kinetic properties
     print('Calculating kinetic information ...')
     if params['parallel']==True:
         print('... in parallel')
-        locs_props=apply_props_dask(locs,
-                                    params['offset'],
-                                    NoPartitions=params['NoPartitions'],
-                                    )
+        locs_props=apply_props_dask(locs)
     else:
-        locs_props=apply_props(locs,
-                               params['offset']
-                               )
+        locs_props=apply_props(locs)
 
-    print('Saving _tprops ...')
+    print('Saving _tmobprops ...')
+    locs_props=locs_props.assign(group=locs_props.index.values) # Write group index into separate column
     info_props=info.copy()+[params]
-    addon_io.save_locs(path+extension+'.hdf5',
-                        locs_props,
-                        info_props,
-                        mode='picasso_compatible')
+    addon_io.save_locs(path+'_tmobprops.hdf5',
+                       locs_props,
+                       info_props,
+                       mode='picasso_compatible')
 
     return [params,locs_props]
