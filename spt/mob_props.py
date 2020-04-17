@@ -15,6 +15,7 @@ import spt.motion_metrics as metrics
 import spt.analytic_expressions as express
 
 importlib.reload(metrics)
+importlib.reload(express)
 
 #%%
 def fit_msd_free(lagtimes,msd,offset=False):
@@ -78,7 +79,7 @@ def fit_msd_free_iterative(lagtimes,msd,lp,max_it=5):
     
     '''
     ### Set inital track length that will be fitted to half the msd, 
-    ### which is already set to only 0.2 of full track length, hence only 10% are used!
+    ### which is already set to only 0.25 of full track length, hence only 12.5% are used!
     p=[int(np.floor(0.5*len(msd)))]
     
     i=0

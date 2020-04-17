@@ -137,11 +137,8 @@ def get_NgT(df,ignore=1):
                        start_frames,
                        taubs_photons,
                        taubs_photons_err)[0]
-    
-    tau_max=pd.Series({'tau_max':np.max(taubs)})
-    s_out=pd.concat([tau_max,gT])
-    
-    return s_out
+        
+    return gT
     
 #%%
 def get_start(df,ignore):
@@ -192,10 +189,13 @@ def get_var(df):
     s_out['bg']=df['bg'].median()
     s_out['photons']=df['photons'].median()
     
-    ### Set sx and sy to standard deviation in x,y (locs!) instead of mean of sx,sy (PSF width)
-    s_out[['sx','sy',]]=df[['x','y']].std()
+    ### Set sx and sy to  maximum spread in x,y (locs!) instead of mean of sx,sy (PSF width)
+    s_out['sx']=df['x'].max()-df['x'].min()
+    s_out['sy']=df['y'].max()-df['y'].min()
+    
     ### Add std_photons
     s_out['std_photons']=df['photons'].std()
+    
     ### Add min/max of frames
     s_out['min_frame']=df['frame'].min()
     s_out['max_frame']=df['frame'].max()

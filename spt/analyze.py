@@ -131,7 +131,7 @@ def get_NgT(df):
     '''
     Return average and 25%/75% interquartile range of all NgT related values.
     '''
-    fields=df.columns.values[24:]
+    fields=df.columns.values[23:]
     NgT_mean=df.loc[:,fields].mean(axis=0)
     NgT_std=df.loc[:,fields].std()
     NgT_iqr50=df.loc[:,fields].quantile(0.50,axis=0)

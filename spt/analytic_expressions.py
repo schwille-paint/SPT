@@ -6,7 +6,7 @@ def msd_free(tau,a,b=0):
     Simple brownian diffusion taking loclization precision into account: msd=a*tau+b.
     According to: Xavier Michalet, Physical Review E, 82, 2010
     '''
-    msd=b*tau+b
+    msd=a*tau+b
     return msd
 
 #%%
