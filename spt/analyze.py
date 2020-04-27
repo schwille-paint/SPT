@@ -44,10 +44,10 @@ def fit_tracks_per_frame(n_tracks):
     return [x,y_fit,popt]
 
 #%%
-def get_mobile_props(df_in,infos):
+def get_mobile_props(df_in,infos,px,CycleTime,remove_immob=True):
     '''
     
-    '''
+    ''' 
     expID=df_in.index.levels[0].values
     
     df_list=[]
@@ -58,9 +58,16 @@ def get_mobile_props(df_in,infos):
     for i in expID:
         df=df_in.loc[(expID[i],slice(None)),:]
         
-        ### 1) Filter for 'stuck' particles
-        istrue=(df.sx**2+df.sx**2)>(np.median(df.lpx*2+df.lpy**2)*10) # Spatial filter
-        df=df[istrue]
+        ### Conversion factor from px^2/frame to 1e-2 microns^2/s for a_iter to diffusion constant
+        a_iter_convert=(px**2/(4*CycleTime))*100
+        
+        ### 1) Remove 'stuck' particles, assuming that diffusion is only governed by localization precision
+        if remove_immob:
+            # istrue=np.sqrt(df.sx*df.sy)>3
+            D_hp=1 # Diffusion constant high pass in 1e-2 microns^2/s
+            istrue = df.a_iter > D_hp/a_iter_convert
+            df=df[istrue]
+        
         df_list.extend([df]) # Assign to list
         
         ### 2) No. of tracks per frame and fit
@@ -90,6 +97,8 @@ def get_mobile_props(df_in,infos):
                           'photons_half':photons_half,
                           'tracks_init':tracks_init,
                           'tracks_loss':tracks_loss,
+                          'CycleTime':CycleTime,
+                          'a_iter_convert': a_iter_convert,
                           })
         result_list.extend([result])
         
@@ -134,9 +143,9 @@ def get_NgT(df):
     fields=df.columns.values[23:]
     NgT_mean=df.loc[:,fields].mean(axis=0)
     NgT_std=df.loc[:,fields].std()
-    NgT_iqr50=df.loc[:,fields].quantile(0.50,axis=0)
-    NgT_iqr25=df.loc[:,fields].quantile(0.25,axis=0)
-    NgT_iqr75=df.loc[:,fields].quantile(0.75,axis=0)
+    NgT_iqr50=np.percentile(df.loc[:,fields],50,axis=0)
+    NgT_iqr25=np.percentile(df.loc[:,fields],25,axis=0)
+    NgT_iqr75=np.percentile(df.loc[:,fields],75,axis=0)
     
     NgT_stats=pd.DataFrame({'mean':NgT_mean,
                       'std':NgT_std,
