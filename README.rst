@@ -26,8 +26,8 @@ SPT requires the following packages:
 
 Please refer to the `readthedocs <https://spt.readthedocs.io/en/latest/index.html#>`_ for further information.
 
-.. image:: files/software-immob.png
-    :width: 600px
+.. image:: docs/files/software-immob.png
+    :width: 400px
     :align: center
     :alt: Workflow
 
