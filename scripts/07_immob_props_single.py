@@ -13,10 +13,11 @@ importlib.reload(improps)
 plt.style.use('~/lbFCS/styles/paper.mplstyle')
 ############################################# Load raw data
 dir_names=[]
-dir_names.extend(['/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/20-01-17_fix_slb_L_T21/id140_L_exp200_p038uW_T21_1'])
+dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_th_slb_L_T21\slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1']*2)
 
 file_names=[]
-file_names.extend(['id140_L_exp200_p038uW_T21_1_MMStack_Pos0.ome_locs_picked.hdf5'])
+file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs_picked0503_tmobprops.hdf5'])
+file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs_picked0503_split50_tmobprops.hdf5'])
 
 ############################################ Set parameters for call to spt.immob_props.main() and dataset
 params={'filter':'fix'} # Parameters

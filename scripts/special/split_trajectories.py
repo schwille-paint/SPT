@@ -20,7 +20,7 @@ file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos
 # file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p250uW_T21_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
 
 ############################################ Set maximum length of sub-trajectories
-subN=25
+subN=100
 
 #%%
 ############################################ Main loop                   

@@ -81,11 +81,8 @@ def gauss_Ncomb(x,p,N):
     y=0
     for i in range(N):
         ### Version with least degrees of freedom
-        y+=gauss_1D(x,(i+1)*p[0],np.sqrt(i+1)*p[1],p[2+i])
-        ### Allow x0 to be different to dx
-        # y+=gauss_1D(x,p[0]+i*p[1],np.sqrt(i+1)*p[2],p[3+i])
-        ### Allow power law spacing
-        # y+=gauss_1D(x,p[0]*(i+1)**p[1],np.sqrt(i+1)*p[2],p[3+i])
+        y+=gauss_1D(x,(i+1)*p[0],np.sqrt(i+1)*p[1],p[2+i]) 
+
     return y
     
     

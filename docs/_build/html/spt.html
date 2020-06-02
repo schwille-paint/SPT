@@ -1,0 +1,483 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Submodules &mdash; SPT 0.1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contact" href="contact.html" />
+    <link rel="prev" title="API" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SPT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-spt.analytic_expressions">spt.analytic_expressions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spt-analyze-module">spt.analyze module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spt-immobile-props-module">spt.immobile_props module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-spt.linklocs">spt.linklocs module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spt-mob-props-module">spt.mob_props module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-spt.motion_metrics">spt.motion_metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-spt.special">spt.special module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SPT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">API</a> &raquo;</li>
+        
+      <li>Submodules</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/spt.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="submodules">
+<h1>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-spt.analytic_expressions">
+<span id="spt-analytic-expressions-module"></span><h2>spt.analytic_expressions module<a class="headerlink" href="#module-spt.analytic_expressions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="spt.analytic_expressions.ecdf">
+<code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">ecdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.ecdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate experimental continuous distribution function (ECDF) of random variable x
+so that counts(value)=probability(x&gt;=value). I.e last value of counts=1.</p>
+<dl class="simple">
+<dt>Equivalent to :</dt><dd><p>matplotlib.pyplot.hist(tau_dist,bins=numpy.unique(tau_dist),normed=True,cumulative=True)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em>) – 1 dimensional array of random variable</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>values</strong> (<em>numpy.ndarray</em>) – Bins of ECDF corresponding to unique values of x.</p></li>
+<li><p><strong>counts</strong> (<em>numpy.ndarray</em>) – counts(value)=probability(x&lt;=value).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.analytic_expressions.exp_tracks_per_frame">
+<code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">exp_tracks_per_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.exp_tracks_per_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exponential like decay to fit number of tracks per frame: NoTracks=a*np.exp(-x/b)+c</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.analytic_expressions.gauss_1D">
+<code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">gauss_1D</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">x0</span></em>, <em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">A</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.gauss_1D" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
+<li><p><strong>A</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
+<li><p><strong>x0</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
+<li><p><strong>sigma</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DESCRIPTION.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>y (TYPE)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.analytic_expressions.gauss_Ncomb">
+<code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">gauss_Ncomb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">p</span></em>, <em class="sig-param"><span class="n">N</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.gauss_Ncomb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.analytic_expressions.msd_anomal">
+<code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">msd_anomal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau</span></em>, <em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.msd_anomal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Anomalous diffusion: msd=a*tau**b
+According to: Carlo Manzo, Report on Progress in Physics, 78, 2015</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.analytic_expressions.msd_free">
+<code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">msd_free</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau</span></em>, <em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.msd_free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple brownian diffusion taking loclization precision into account: msd=a*tau+b.
+According to: Xavier Michalet, Physical Review E, 82, 2010</p>
+</dd></dl>
+
+</div>
+<div class="section" id="spt-analyze-module">
+<h2>spt.analyze module<a class="headerlink" href="#spt-analyze-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="spt-immobile-props-module">
+<h2>spt.immobile_props module<a class="headerlink" href="#spt-immobile-props-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-spt.linklocs">
+<span id="spt-linklocs-module"></span><h2>spt.linklocs module<a class="headerlink" href="#module-spt.linklocs" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="spt.linklocs.drop_shorttracks">
+<code class="sig-prename descclassname">spt.linklocs.</code><code class="sig-name descname">drop_shorttracks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">crit_len</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.linklocs.drop_shorttracks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to remove trajectories shorter than crit_len from picked.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Trajectories DataFrame (see trackpy.link())</p></li>
+<li><p><strong>crit_len</strong> (<em>int=10</em>) – Trajectories lower than crit_len (frames) will be removed from df</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.linklocs.get_link">
+<code class="sig-prename descclassname">spt.linklocs.</code><code class="sig-name descname">get_link</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locs</span></em>, <em class="sig-param"><span class="n">search_range</span></em>, <em class="sig-param"><span class="n">memory</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.linklocs.get_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply trackpy.link_df on localizations with given search_range and memory to get tracks sorted by group and frame.
+All tracks shorter or equal to 10 frames are removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>locs</strong> (<em>pandas.DataFrame</em>) – Localizations loaded with picasso.io.load_locs() as pandas.DataFrame</p></li>
+<li><p><strong>info</strong> (<em>picasso.io</em>) – Info as loaded by picasso.io.load_locs()</p></li>
+<li><p><strong>search_range</strong> (<em>int</em>) – Localizations within search_range (spatial) will be connetcted to tracks (see trackpy.link_df)</p></li>
+<li><p><strong>memory</strong> (<em>int</em>) – Localizations within memory (temporal) will be connetcted to tracks (see trackpy.link_df)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Linked trajecories using trackpy.link() with parameters.</dt><dd><p>All trajectories with &lt;= 10 localizations are already removed!!</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>link(pandas.DataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.linklocs.main">
+<code class="sig-prename descclassname">spt.linklocs.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locs</span></em>, <em class="sig-param"><span class="n">info</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.linklocs.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function to call get_link in a convenient way with data saving.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.linklocs.plot_scan_results">
+<code class="sig-prename descclassname">spt.linklocs.</code><code class="sig-name descname">plot_scan_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">prox</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.linklocs.plot_scan_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quickly plot results of scan_sr_mem().</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Return DataFrame of scan_sr_mem()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.linklocs.scan_sr_mem">
+<code class="sig-prename descclassname">spt.linklocs.</code><code class="sig-name descname">scan_sr_mem</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locs</span></em>, <em class="sig-param"><span class="n">info</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">sr</span></em>, <em class="sig-param"><span class="n">mem</span></em>, <em class="sig-param"><span class="n">roi</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timewindow</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.linklocs.scan_sr_mem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quick scan of the trackpy.link algorithm using tuples of searc_hranges and memory
+over center ROI and starting time window of the video. Output and coresponding plot will be saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>locs</strong> (<em>pandas.DataFrame</em>) – Localizations loaded with picasso.io.load_locs() as pandas.DataFrame</p></li>
+<li><p><strong>info</strong> (<em>picasso.io</em>) – Info as loaded by picasso.io.load_locs()</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – Path to _locs.hdf5 file for saving output</p></li>
+<li><p><strong>sr</strong> (<em>list</em><em>(</em><em>int</em><em>)</em>) – List of search_ranges to scan (see trackpy.link)</p></li>
+<li><p><strong>mem</strong> (<em>list</em><em>(</em><em>int</em><em>)</em>) – List of memory values to scan  (see trackpy.link)</p></li>
+<li><p><strong>roi</strong> (<em>bool=True</em>) – If True scan is performed on cropped video to center 200^2px FOV</p></li>
+<li><p><strong>timewindow</strong> (<em>bool=True</em>) – If True scan is performed on first 300 frames of video only</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>df_out(pandas.DataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="spt-mob-props-module">
+<h2>spt.mob_props module<a class="headerlink" href="#spt-mob-props-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-spt.motion_metrics">
+<span id="spt-motion-metrics-module"></span><h2>spt.motion_metrics module<a class="headerlink" href="#module-spt.motion_metrics" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="spt.motion_metrics.displacement_moments">
+<code class="sig-prename descclassname">spt.motion_metrics.</code><code class="sig-name descname">displacement_moments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.motion_metrics.displacement_moments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.motion_metrics.msd_ratio">
+<code class="sig-prename descclassname">spt.motion_metrics.</code><code class="sig-name descname">msd_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moments</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.motion_metrics.msd_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>MSD ratio (classifier H.) according to P. Kowalek, Physical Review E, 100, 2019.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.motion_metrics.straightness">
+<code class="sig-prename descclassname">spt.motion_metrics.</code><code class="sig-name descname">straightness</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.motion_metrics.straightness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Straightness (classifier I.) according to P. Kowalek, Physical Review E, 100, 2019.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-spt.special">
+<span id="spt-special-module"></span><h2>spt.special module<a class="headerlink" href="#module-spt.special" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="spt.special.assign_prop_to_picked">
+<code class="sig-prename descclassname">spt.special.</code><code class="sig-name descname">assign_prop_to_picked</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">props</span></em>, <em class="sig-param"><span class="n">picked</span></em>, <em class="sig-param"><span class="n">field</span><span class="o">=</span><span class="default_value">'a_iter'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.special.assign_prop_to_picked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.special.assign_subgroup">
+<code class="sig-prename descclassname">spt.special.</code><code class="sig-name descname">assign_subgroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">subN</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.special.assign_subgroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renames group colum into supgroup and and assigns new column subgroup.
+Each subgroup splits the supgroup in chunks of subN, i.e. splitting of trajectories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Picked localizations (see picasso.render)</p></li>
+<li><p><strong>subN</strong> (<em>int</em>) – Maximum length of sub-trajectories</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Picked localizations (see picasso.render) with one new (subgroup)</dt><dd><p>and one modified column (supgroup = group of original). See also above.              :</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>subdf(pandas.DataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.special.get_trackmap">
+<code class="sig-prename descclassname">spt.special.</code><code class="sig-name descname">get_trackmap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locs</span></em>, <em class="sig-param"><span class="n">fov</span></em>, <em class="sig-param"><span class="n">oversampling</span></em>, <em class="sig-param"><span class="n">field</span><span class="o">=</span><span class="default_value">'assign_field'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.special.get_trackmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.special.pair_ids">
+<code class="sig-prename descclassname">spt.special.</code><code class="sig-name descname">pair_ids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.special.pair_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to map two integers to one in a unique and deterministic manner.
+Python implementation of Matthew Szudzik’s elegant pairing function (WolframAlpha)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.special.render_trackmap">
+<code class="sig-prename descclassname">spt.special.</code><code class="sig-name descname">render_trackmap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">flatyxf_u</span></em>, <em class="sig-param"><span class="n">image_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.special.render_trackmap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.special.split_trajectories">
+<code class="sig-prename descclassname">spt.special.</code><code class="sig-name descname">split_trajectories</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">subN</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.special.split_trajectories" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Split trajectories into shorter trajectories of length subN. Three new columns are assigned to give track ID:</dt><dd><p>supgroup: Super-group = group column of original
+subgroup: Sub-group = New trajectories of length subN or lower
+group:    Unique new sub-group ID</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Picked localizations (see picasso.render)</p></li>
+<li><p><strong>subN</strong> (<em>int</em>) – Maximum length of sub-trajectories</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Picked localizations (see picasso.render) with three new or modified columns (see above)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>subdf(pandas.DataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contact.html" class="btn btn-neutral float-right" title="Contact" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="modules.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Florian Stehr
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

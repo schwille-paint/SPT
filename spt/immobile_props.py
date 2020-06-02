@@ -384,8 +384,7 @@ def cluster_setup_howto():
     print('       processes=True,')
     print('       threads_per_worker=1,')
     print('       scheduler_port=8787,')
-    print('       dashboard_address=":1234")')                  
-
+    print('       dashboard_address=":1234")') 
     return
 
 #%%
@@ -421,14 +420,14 @@ def filter_(df,NoFrames,apply_filter=None):
     '''
     Decide which filter to apply.
     '''
-    if apply_filter=='fix':
+    if apply_filter=='sd':
         df_filter=filter_fix(df)
-    elif apply_filter=='paint':
+    elif apply_filter=='th':
         df_filter=filter_nofix(df,NoFrames)
     elif apply_filter=='none':
         df_filter=df.copy()
     else:
-        print('No filter criterium chosen. Please choose fix,paint,None')
+        print('No filter criterium chosen. Please choose sd,th,none')
         sys.exit()
     
     return df_filter
@@ -450,7 +449,7 @@ def main(locs,info,path,**params):
         ignore(int=1):             Ignore value for bright frame
         parallel(bool=True):       Apply parallel computing using dask? 
                                    Dask cluster should be set up and running for best performance!
-        filter(string='paint'):    Which filter to use, either None, 'paint' or 'fix'
+        filter(string='paint'):    Which filter to use, either None, 'th' or 'sd' or 'none'
         save_picked(bool=False):   If true _picked file containing just groups that passed filter will be saved under _picked_valid
     
     return:

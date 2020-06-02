@@ -78,8 +78,8 @@ def split_trajectories(df,subN):
     supdf=df.rename(columns={'group':'supgroup'})
     
     ### Convert groups in supgroups and assign subgroups of len subN to df
-    with tqdm.pandas(): # For progressbar under apply
-        subdf=supdf.groupby('supgroup').apply(lambda df: assign_subgroup(df,subN))
+    # with tqdm.pandas(): # For progressbar under apply
+    subdf=supdf.groupby('supgroup').apply(lambda df: assign_subgroup(df,subN))
     subdf.reset_index(inplace=True)
     subdf.drop(columns=['level_1'],inplace=True)
     

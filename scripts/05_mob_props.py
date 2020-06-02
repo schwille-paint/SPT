@@ -14,14 +14,43 @@ importlib.reload(improps)
 
 ############################################# Load raw data
 dir_names=[]
-dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_th_slb_L_T21\slb_id169_R1-54#_R1s1-8_40nM_exp200_p250uW_T21_1'])
+# dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_th_slb_L_T21\slb_id169_R1-54#_R1s1-8_40nM_exp200_p038uW_T21_1'])
+dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_th_slb_L_T21\slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1'])
+# dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_th_slb_L_T21\slb_id169_R1-54#_R1s1-8_40nM_exp200_p250uW_T21_1'])
+
+# dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_fix_slb_L_T21\slb_id140_L_exp200_p038uW_T21_1'])
+# dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_fix_slb_L_T21\slb_id140_L_exp200_p038uW_T21_2'])
+# dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_fix_slb_L_T21\slb_id140_L_exp200_p038uW_T21_3'])
+
+# dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_fix_slb_L_T21\slb_id140_L_exp200_p114uW_T21_1'])
+# dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_fix_slb_L_T21\slb_id140_L_exp200_p114uW_T21_2'])
+# dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_fix_slb_L_T21\slb_id140_L_exp200_p114uW_T21_3'])
+
+# dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_fix_slb_L_T21\slb_id140_L_exp200_p250uW_T21_1'])
+# dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_fix_slb_L_T21\slb_id140_L_exp200_p250uW_T21_2'])
+# dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_fix_slb_L_T21\slb_id140_L_exp200_p250uW_T21_3'])
+
 
 file_names=[]
-file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p250uW_T21_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+# file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p038uW_T21_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs_picked0503_split100.hdf5'])
+# file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p250uW_T21_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+
+# file_names.extend(['slb_id140_L_exp200_p038uW_T21_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+# file_names.extend(['slb_id140_L_exp200_p038uW_T21_2_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+# file_names.extend(['slb_id140_L_exp200_p038uW_T21_3_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+
+# file_names.extend(['slb_id140_L_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+# file_names.extend(['slb_id140_L_exp200_p114uW_T21_2_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+# file_names.extend(['slb_id140_L_exp200_p114uW_T21_3_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+
+# file_names.extend(['slb_id140_L_exp200_p250uW_T21_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+# file_names.extend(['slb_id140_L_exp200_p250uW_T21_2_MMStack_Pos0.ome_locs_picked0503.hdf5'])
+# file_names.extend(['slb_id140_L_exp200_p250uW_T21_3_MMStack_Pos0.ome_locs_picked0503.hdf5'])
 
 ############################################ Set non standard parameters 
 ### Valid for all evaluations
-params_all={'parallel':True}
+params_all={'parallel':False}
 ## Exceptions
 params_special={}
 

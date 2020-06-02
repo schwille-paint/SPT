@@ -85,15 +85,15 @@ def fit_msd_free_iterative(lagtimes,msd,lp,max_it=5):
     i=0
     while i<max_it:
         ### Truncate msd up to p for optimal fitting result
-        x=lagtimes[:p[-1]]
+        t=lagtimes[:p[-1]]
         y=msd[:p[-1]]    
 
         ### Fit truncated msd
-        s_out=fit_msd_free(x,y,offset=True)
+        s_out=fit_msd_free(t,y,offset=True)
         
-        ### Update x
-        x=np.abs(lp/(s_out['a']/4))
-        # x=np.abs(s_out['b']/(s_out['a']/4))
+        ### Update x 
+        x=np.abs((4*lp)/s_out['a'])
+        # x=np.abs(s_out['b']/(s_out['a']))
         
         ### Assign iteration and fitted track length
         s_out['p']=p[-1]
@@ -148,7 +148,7 @@ def getfit_moments(df):
     s_anom_msd=fit_msd_anomal(x,y).rename({'a':'a_anom','b':'b_anom'})
     
     ### Iterative fit
-    lp=np.median(df.lpx**2+df.lpy**2) # Get localization precision as input for iterative fit
+    lp=np.mean(df.lpx**2+df.lpy**2) # Get localization precision as input for iterative fit
     s_iter=fit_msd_free_iterative(x,y,lp).rename({'a':'a_iter','b':'b_iter','p':'p_iter','max_it':'max_iter'})
     
     ########################## MME fitting

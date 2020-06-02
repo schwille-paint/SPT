@@ -10,10 +10,10 @@ importlib.reload(linklocs)
 
 ######################################## Define data (locs)
 dir_names=[]
-dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_th_slb_L_T21\slb_id169_R1-54#_R1s1-8_40nM_exp200_p250uW_T21_1'])
+dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_th_slb_L_T21\slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1'])
 
 file_names=[]
-file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p250uW_T21_1_MMStack_Pos0.ome_locs.hdf5'])
+file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs.hdf5'])
 
 #%%
 ######################################## Read in single data set
@@ -24,8 +24,8 @@ locs,info=io.load_locs(path)
 locs=pd.DataFrame(locs)
 
 ######################################## Parameter scan for linking
-search_range=[1,3,5,6,7]
-memory=[1,2,3]
+search_range=[2,3,5,7]
+memory=[1,2,3,4]
 #### Get scan results    
 scan_results=linklocs.scan_sr_mem(locs,
                                   info,
@@ -36,8 +36,8 @@ scan_results=linklocs.scan_sr_mem(locs,
 
 #%%
 ######################################## Link all data sets 
-params_all={'search_range':5,
-            'memory':3,
+params_all={'search_range':3,
+            'memory':1,
             }
 
 params_special={}
