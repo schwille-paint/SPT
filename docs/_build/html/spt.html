@@ -87,10 +87,10 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">API</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Submodules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-spt.analytic_expressions">spt.analytic_expressions module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#spt-analyze-module">spt.analyze module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#spt-immobile-props-module">spt.immobile_props module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-spt.analyze">spt.analyze module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-spt.immobile_props">spt.immobile_props module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-spt.linklocs">spt.linklocs module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#spt-mob-props-module">spt.mob_props module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-spt.mob_props">spt.mob_props module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-spt.motion_metrics">spt.motion_metrics module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-spt.special">spt.special module</a></li>
 </ul>
@@ -238,11 +238,219 @@ According to: Xavier Michalet, Physical Review E, 82, 2010</p>
 </dd></dl>
 
 </div>
-<div class="section" id="spt-analyze-module">
-<h2>spt.analyze module<a class="headerlink" href="#spt-analyze-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-spt.analyze">
+<span id="spt-analyze-module"></span><h2>spt.analyze module<a class="headerlink" href="#module-spt.analyze" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="spt.analyze.fit_tracks_per_frame">
+<code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">fit_tracks_per_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_tracks</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.fit_tracks_per_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit number of trajectories per frame with deaying exponential</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.analyze.get_NgT">
+<code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">get_NgT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.get_NgT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return average and 25%/75% interquartile range of all NgT related values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.analyze.get_T_with_N">
+<code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">get_T_with_N</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.get_T_with_N" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return critical times of NgT</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.analyze.get_half_time">
+<code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">get_half_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.get_half_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get half life time, i.e. 1-ecdf (means bigger than T) of start times for different ignore values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.analyze.get_mobile_props">
+<code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">get_mobile_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df_in</span></em>, <em class="sig-param"><span class="n">infos</span></em>, <em class="sig-param"><span class="n">px</span></em>, <em class="sig-param"><span class="n">CycleTime</span></em>, <em class="sig-param"><span class="n">remove_immob</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.get_mobile_props" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.analyze.get_props">
+<code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">get_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.get_props" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Wrapper function to combine:</dt><dd><ul class="simple">
+<li><p>get_half_time(df)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.analyze.get_result">
+<code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">get_result</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.get_result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.analyze.tracks_per_frame">
+<code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">tracks_per_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">props</span></em>, <em class="sig-param"><span class="n">NoFrames</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.tracks_per_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count number of trajectories per frame.</p>
+</dd></dl>
+
 </div>
-<div class="section" id="spt-immobile-props-module">
-<h2>spt.immobile_props module<a class="headerlink" href="#spt-immobile-props-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-spt.immobile_props">
+<span id="spt-immobile-props-module"></span><h2>spt.immobile_props module<a class="headerlink" href="#module-spt.immobile_props" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="spt.immobile_props.apply_props">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">apply_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.apply_props" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.apply_props_dask">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">apply_props_dask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.apply_props_dask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies pick_props.get_props(df,NoFrames,ignore) to each group in parallelized manner using dask by splitting df into
+various partitions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.cluster_setup_howto">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">cluster_setup_howto</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.cluster_setup_howto" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.filter_">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">filter_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">NoFrames</span></em>, <em class="sig-param"><span class="n">apply_filter</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.filter_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decide which filter to apply.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.filter_fix">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">filter_fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.filter_fix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter for fixed single dye experiments</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.filter_nofix">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">filter_nofix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">NoFrames</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.filter_nofix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter for DNA-PAINT based tracking handle. Under progress…</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.fit_Ncomb">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">fit_Ncomb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">centers_init</span></em>, <em class="sig-param"><span class="n">N</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.fit_Ncomb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.fit_levels">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">fit_levels</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">centers_init</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.fit_levels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.get_NgT">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_NgT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_NgT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine get_taubs and taubs_to_NgT to return NgT as pd.Series. Additionaly return longest trajectory in trace as tau_max.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.get_props">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_props" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Wrapper function to combine:</dt><dd><ul class="simple">
+<li><p>get_NgT(df,Ts,ignore)</p></li>
+<li><p>get_start(df,ignore)</p></li>
+</ul>
+</dd>
+</dl>
+<p>args:</p>
+<p>returns:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.get_start">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_start</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get occurence of first localization in group and number of consecutive on frames starting from frame=0.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.get_taubs">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_taubs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_taubs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return array of bright times and corresponding 1st frame of each bright event of for trace of a group.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.get_trace">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_trace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">NoFrames</span></em>, <em class="sig-param"><span class="n">field</span><span class="o">=</span><span class="default_value">'net_gradient'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get intensity vs time trace of length=NoFrames for group.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.get_var">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_var</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_var" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get various properties for each group of picked localizations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Picked localizations (see picasso.render)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>index: Means of all columns in df, plus:</dt><dd><p>’n_locs’:      Number of localizations
+‘photons’:     Not mean but median!
+‘std_photons’: Standard deviation of photons.
+‘bg’:          Background photons. Not mean but median!
+‘sx’:          Standard deviation of group in ‘x’
+‘sy’:          Standard deviation of group in ‘y’
+‘min_frame’:   Mimimum in frames
+‘max_frame’:   Maximum in frames
+‘len’:         max_frame-min_frame (see above)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>s_out(pandas.Series)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.main">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locs</span></em>, <em class="sig-param"><span class="n">info</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster detection (pick) in localization list by thresholding in number of localizations per cluster.
+Cluster centers are determined by creating images of localization list with set oversampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>locs</strong> (<em>pd.Dataframe</em>) – Picked localizations as created by picasso render</p></li>
+<li><p><strong>info</strong> (<em>list</em><em>(</em><em>dict</em><em>)</em>) – Info to picked localizations</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – Path to _picked.hdf5 file.</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>ignore(int=1):             Ignore value for bright frame
+parallel(bool=True):       Apply parallel computing using dask?</p>
+<blockquote>
+<div><p>Dask cluster should be set up and running for best performance!</p>
+</div></blockquote>
+<p>filter(string=’paint’):    Which filter to use, either None, ‘th’ or ‘sd’ or ‘none’
+save_picked(bool=False):   If true _picked file containing just groups that passed filter will be saved under _picked_valid</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>Dict of <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs passed to function.
+list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
+<blockquote>
+<div><p>Will be saved with extension ‘_picked_tprops.hdf5’ for usage in picasso.filter</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list[0](dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.immobile_props.tracks_greaterT">
+<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">tracks_greaterT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">track_length</span></em>, <em class="sig-param"><span class="n">track_start</span></em>, <em class="sig-param"><span class="n">track_photons</span></em>, <em class="sig-param"><span class="n">track_photons_std</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.tracks_greaterT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return number of bright times greater than Ts as array of len(Ts).</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-spt.linklocs">
 <span id="spt-linklocs-module"></span><h2>spt.linklocs module<a class="headerlink" href="#module-spt.linklocs" title="Permalink to this headline">¶</a></h2>
@@ -331,8 +539,91 @@ over center ROI and starting time window of the video. Output and coresponding p
 </dd></dl>
 
 </div>
-<div class="section" id="spt-mob-props-module">
-<h2>spt.mob_props module<a class="headerlink" href="#spt-mob-props-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-spt.mob_props">
+<span id="spt-mob-props-module"></span><h2>spt.mob_props module<a class="headerlink" href="#module-spt.mob_props" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="spt.mob_props.apply_props">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">apply_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.apply_props" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.mob_props.apply_props_dask">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">apply_props_dask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.apply_props_dask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies pick_props.get_props(df,NoFrames,ignore) to each group in parallelized manner using dask by splitting df into
+various partitions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.mob_props.fit_msd_anomal">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">fit_msd_anomal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lagtimes</span></em>, <em class="sig-param"><span class="n">msd</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.fit_msd_anomal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.mob_props.fit_msd_free">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">fit_msd_free</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lagtimes</span></em>, <em class="sig-param"><span class="n">msd</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.fit_msd_free" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.mob_props.fit_msd_free_iterative">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">fit_msd_free_iterative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lagtimes</span></em>, <em class="sig-param"><span class="n">msd</span></em>, <em class="sig-param"><span class="n">lp</span></em>, <em class="sig-param"><span class="n">max_it</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.fit_msd_free_iterative" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.mob_props.get_props">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">get_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.get_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper function to combine:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – ‘locs’ of locs_picked.hdf5 as given by Picasso</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>s</strong> – Columns as defined in individual functions. Index corresponds to ‘group’.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.mob_props.getfit_moments">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">getfit_moments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.getfit_moments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate msd of single trjecory using metrics.mean_displacement_moments() and apply all fit methods.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.mob_props.main">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locs</span></em>, <em class="sig-param"><span class="n">info</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster detection (pick) in localization list by thresholding in number of localizations per cluster.
+Cluster centers are determined by creating images of localization list with set oversampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>locs</strong> (<em>pd.Dataframe</em>) – Picked localizations as created by picasso render</p></li>
+<li><p><strong>info</strong> (<em>list</em><em>(</em><em>dict</em><em>)</em>) – Info to picked localizations</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – Path to _picked.hdf5 file.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt><a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>Dict of <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs passed to function.
+list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
+<blockquote>
+<div><p>Will be saved with extension ‘_picked_tprops.hdf5’ for usage in picasso.filter</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list[0](dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-spt.motion_metrics">
 <span id="spt-motion-metrics-module"></span><h2>spt.motion_metrics module<a class="headerlink" href="#module-spt.motion_metrics" title="Permalink to this headline">¶</a></h2>

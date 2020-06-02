@@ -32,6 +32,7 @@ release = '0.1.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 import sphinx_rtd_theme
+
 extensions = [
 'sphinx.ext.autodoc',
 'sphinx.ext.napoleon',

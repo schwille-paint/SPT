@@ -25,5 +25,5 @@ dependencies:
   - trackpy
   - pip:
     - lmfit
-    - sphinx-rtd-theme
+    - sphinx_rtd_theme
 
