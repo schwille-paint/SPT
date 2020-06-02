@@ -86,13 +86,13 @@
 <li class="toctree-l1"><a class="reference internal" href="howto.html">Usage</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">API</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-spt.analytic_expressions">spt.analytic_expressions module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-spt.analyze">spt.analyze module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-spt.immobile_props">spt.immobile_props module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-spt.linklocs">spt.linklocs module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-spt.mob_props">spt.mob_props module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-spt.motion_metrics">spt.motion_metrics module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-spt.special">spt.special module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spt-analytic-expressions">spt.analytic_expressions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spt-analyze">spt.analyze</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spt-immobile-props">spt.immobile_props</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spt-linklocs">spt.linklocs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spt-mob-props">spt.mob_props</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spt-motion-metrics">spt.motion_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spt-special">spt.special</a></li>
 </ul>
 </li>
 </ul>
@@ -166,9 +166,10 @@
             
   <div class="section" id="submodules">
 <h1>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-spt.analytic_expressions">
-<span id="spt-analytic-expressions-module"></span><h2>spt.analytic_expressions module<a class="headerlink" href="#module-spt.analytic_expressions" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<div class="section" id="spt-analytic-expressions">
+<h2>spt.analytic_expressions<a class="headerlink" href="#spt-analytic-expressions" title="Permalink to this headline">¶</a></h2>
+<p>Some analytic expressions used in other submodules, e.g. fitting functions, cdf, …</p>
+<span class="target" id="module-spt.analytic_expressions"></span><dl class="py function">
 <dt id="spt.analytic_expressions.ecdf">
 <code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">ecdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.ecdf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate experimental continuous distribution function (ECDF) of random variable x
@@ -238,9 +239,10 @@ According to: Xavier Michalet, Physical Review E, 82, 2010</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-spt.analyze">
-<span id="spt-analyze-module"></span><h2>spt.analyze module<a class="headerlink" href="#module-spt.analyze" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<div class="section" id="spt-analyze">
+<h2>spt.analyze<a class="headerlink" href="#spt-analyze" title="Permalink to this headline">¶</a></h2>
+<p>Further evaluate (averaging, …) <a href="#id1"><span class="problematic" id="id2">*</span></a>_tprops. or <a href="#id3"><span class="problematic" id="id4">*</span></a>_tmobprops.hdf5 files, i.e. to generate end result of kinetic analysis.</p>
+<span class="target" id="module-spt.analyze"></span><dl class="py function">
 <dt id="spt.analyze.fit_tracks_per_frame">
 <code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">fit_tracks_per_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_tracks</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.fit_tracks_per_frame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit number of trajectories per frame with deaying exponential</p>
@@ -292,9 +294,10 @@ According to: Xavier Michalet, Physical Review E, 82, 2010</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-spt.immobile_props">
-<span id="spt-immobile-props-module"></span><h2>spt.immobile_props module<a class="headerlink" href="#module-spt.immobile_props" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<div class="section" id="spt-immobile-props">
+<h2>spt.immobile_props<a class="headerlink" href="#spt-immobile-props" title="Permalink to this headline">¶</a></h2>
+<p>Kinetic properties of picks for immobilized samples, e.g. TPP, photons, binding events, …</p>
+<span class="target" id="module-spt.immobile_props"></span><dl class="py function">
 <dt id="spt.immobile_props.apply_props">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">apply_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.apply_props" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -421,7 +424,7 @@ Cluster centers are determined by creating images of localization list with set 
 </dd>
 </dl>
 <dl>
-<dt><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>ignore(int=1):             Ignore value for bright frame
+<dt><a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>ignore(int=1):             Ignore value for bright frame
 parallel(bool=True):       Apply parallel computing using dask?</p>
 <blockquote>
 <div><p>Dask cluster should be set up and running for best performance!</p>
@@ -432,7 +435,7 @@ save_picked(bool=False):   If true _picked file containing just groups that pass
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>Dict of <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs passed to function.
+<dd class="field-odd"><p><p>Dict of <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs passed to function.
 list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
 <blockquote>
 <div><p>Will be saved with extension ‘_picked_tprops.hdf5’ for usage in picasso.filter</p>
@@ -452,9 +455,10 @@ list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-spt.linklocs">
-<span id="spt-linklocs-module"></span><h2>spt.linklocs module<a class="headerlink" href="#module-spt.linklocs" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<div class="section" id="spt-linklocs">
+<h2>spt.linklocs<a class="headerlink" href="#spt-linklocs" title="Permalink to this headline">¶</a></h2>
+<p>Linking of localizations into particle trajectories using <a class="reference external" href="http://soft-matter.github.io/trackpy/v0.4.2/">trackpy</a>.</p>
+<span class="target" id="module-spt.linklocs"></span><dl class="py function">
 <dt id="spt.linklocs.drop_shorttracks">
 <code class="sig-prename descclassname">spt.linklocs.</code><code class="sig-name descname">drop_shorttracks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">crit_len</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.linklocs.drop_shorttracks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to remove trajectories shorter than crit_len from picked.</p>
@@ -539,9 +543,10 @@ over center ROI and starting time window of the video. Output and coresponding p
 </dd></dl>
 
 </div>
-<div class="section" id="module-spt.mob_props">
-<span id="spt-mob-props-module"></span><h2>spt.mob_props module<a class="headerlink" href="#module-spt.mob_props" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<div class="section" id="spt-mob-props">
+<h2>spt.mob_props<a class="headerlink" href="#spt-mob-props" title="Permalink to this headline">¶</a></h2>
+<p>Kinetic properties of trajectories for of mobile samples, e.g. MSD caluclation and fitting, …</p>
+<span class="target" id="module-spt.mob_props"></span><dl class="py function">
 <dt id="spt.mob_props.apply_props">
 <code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">apply_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.apply_props" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -606,12 +611,12 @@ Cluster centers are determined by creating images of localization list with set 
 </dd>
 </dl>
 <dl class="simple">
-<dt><a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)</p>
+<dt><a href="#id9"><span class="problematic" id="id10">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)</p>
 </dd>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>Dict of <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs passed to function.
+<dd class="field-odd"><p><p>Dict of <a href="#id11"><span class="problematic" id="id12">**</span></a>kwargs passed to function.
 list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
 <blockquote>
 <div><p>Will be saved with extension ‘_picked_tprops.hdf5’ for usage in picasso.filter</p>
@@ -625,9 +630,10 @@ list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-spt.motion_metrics">
-<span id="spt-motion-metrics-module"></span><h2>spt.motion_metrics module<a class="headerlink" href="#module-spt.motion_metrics" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<div class="section" id="spt-motion-metrics">
+<h2>spt.motion_metrics<a class="headerlink" href="#spt-motion-metrics" title="Permalink to this headline">¶</a></h2>
+<p>Numba optimized caluclation of motion metrics like MSD, MME, straightness, msd_ratio, …</p>
+<span class="target" id="module-spt.motion_metrics"></span><dl class="py function">
 <dt id="spt.motion_metrics.displacement_moments">
 <code class="sig-prename descclassname">spt.motion_metrics.</code><code class="sig-name descname">displacement_moments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.motion_metrics.displacement_moments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -645,9 +651,10 @@ list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-spt.special">
-<span id="spt-special-module"></span><h2>spt.special module<a class="headerlink" href="#module-spt.special" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<div class="section" id="spt-special">
+<h2>spt.special<a class="headerlink" href="#spt-special" title="Permalink to this headline">¶</a></h2>
+<p>Some speial functions, e.g. track splitting, generation of track and diffusion maps, …</p>
+<span class="target" id="module-spt.special"></span><dl class="py function">
 <dt id="spt.special.assign_prop_to_picked">
 <code class="sig-prename descclassname">spt.special.</code><code class="sig-name descname">assign_prop_to_picked</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">props</span></em>, <em class="sig-param"><span class="n">picked</span></em>, <em class="sig-param"><span class="n">field</span><span class="o">=</span><span class="default_value">'a_iter'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.special.assign_prop_to_picked" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
