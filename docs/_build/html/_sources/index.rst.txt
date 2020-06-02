@@ -1,5 +1,3 @@
-.. _SPT:
-	https://github.com/schwille-paint/SPT
 .. _picasso_addon:
 	https://github.com/schwille-paint/picasso_addon
 .. _picasso:

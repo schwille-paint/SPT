@@ -23,8 +23,7 @@ SPT requires the following packages:
     - `picasso`_  :  Localization and rendering of super-reolution images
     - `picasso_addon`_ : Further functionalities for picasso (auto net-gradient, autopick)
 
-
-Please refer to the `readthedocs <https://spt.readthedocs.io/en/latest/index.html#>`_ for further information.
+.. note:: Please refer to the `readthedocs <https://spt.readthedocs.io/en/latest/index.html#>`_ for further information.
 
 .. image:: docs/files/software-immob.png
     :width: 400px
