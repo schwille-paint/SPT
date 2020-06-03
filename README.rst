@@ -46,7 +46,7 @@ necessary dependencies for SPT.
 
 Download and use SPT
 ^^^^^^^^^^^^^^^^^^^^
-To use the SPT package please clone the `SPT`_ GitHub repository. 
+To use the SPT package please clone the SPT GitHub repository. 
 You can add the package to your environment (e.g. ``picasso_addon``) by switching to the downloaded folder (SPT) and typing
 
 .. code-block:: console

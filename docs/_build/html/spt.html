@@ -243,6 +243,16 @@ According to: Xavier Michalet, Physical Review E, 82, 2010</p>
 <h2>spt.analyze<a class="headerlink" href="#spt-analyze" title="Permalink to this headline">¶</a></h2>
 <p>Further evaluate (averaging, …) <a href="#id1"><span class="problematic" id="id2">*</span></a>_tprops. or <a href="#id3"><span class="problematic" id="id4">*</span></a>_tmobprops.hdf5 files, i.e. to generate end result of kinetic analysis.</p>
 <span class="target" id="module-spt.analyze"></span><dl class="py function">
+<dt id="spt.analyze.fit_Ncomb">
+<code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">fit_Ncomb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">centers_init</span></em>, <em class="sig-param"><span class="n">N</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.fit_Ncomb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spt.analyze.fit_levels">
+<code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">fit_levels</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">centers_init</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.fit_levels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="spt.analyze.fit_tracks_per_frame">
 <code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">fit_tracks_per_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_tracks</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.fit_tracks_per_frame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit number of trajectories per frame with deaying exponential</p>
@@ -300,111 +310,288 @@ According to: Xavier Michalet, Physical Review E, 82, 2010</p>
 <span class="target" id="module-spt.immobile_props"></span><dl class="py function">
 <dt id="spt.immobile_props.apply_props">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">apply_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.apply_props" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Group _picked.hdf5 by groups (i.e. picks in <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a>) and
+apply get_props() to each group to get immobile properties as in <a class="reference external" href="https://www.biorxiv.org/content/10.1101/2020.05.17.100354v1">spt</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Grouped localization list, i.e. _picked.hdf5 as in <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a></p></li>
+<li><p><strong>ignore</strong> (<em>int=1</em>) – Maximum interruption (frames) allowed to be regarded as one bright time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output of get_props() for each group in <code class="docutils literal notranslate"><span class="pre">df</span></code> (groupby-apply approach).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="spt.immobile_props.apply_props_dask">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">apply_props_dask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.apply_props_dask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Applies pick_props.get_props(df,NoFrames,ignore) to each group in parallelized manner using dask by splitting df into
-various partitions.</p>
+<dd><p>Same as apply_props() but in parallelized version using DASK by partitioning df.
+Local DASK cluster has to be started manually for efficient computation, see cluster_setup_howto().</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Grouped localization list, i.e. _picked.hdf5 as in <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a></p></li>
+<li><p><strong>ignore</strong> (<em>int=1</em>) – Maximum interruption (frames) allowed to be regarded as one bright time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output of get_props() for each group in <code class="docutils literal notranslate"><span class="pre">df</span></code> (groupby-apply approach).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.immobile_props.cluster_setup_howto">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">cluster_setup_howto</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.cluster_setup_howto" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Print instruction howto start a DASK local cluster for efficient computation of apply_props_dask().
+Fixed <code class="docutils literal notranslate"><span class="pre">scheduler_port=8787</span></code> is used to easily reconnect to cluster once it was started.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="spt.immobile_props.filter_">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">filter_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">NoFrames</span></em>, <em class="sig-param"><span class="n">apply_filter</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.filter_" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decide which filter to apply.</p>
+<dd><p>Decide which filter to apply to the output of get_props(), either:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>‘sd’ as given by filter_fix()</p></li>
+<li><p>‘th’ as given by filter_nofix()</p></li>
+<li><p>‘none’ if no filter should be applied</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Immobile properties as calulated by apply_props()</p></li>
+<li><p><strong>NoFrames</strong> (<em>int</em>) – Length of measurement in frames of corresponding raw movie.</p></li>
+<li><p><strong>apply_filter</strong> (<em>str</em>) – Either ‘sd’,’th’ or ‘none’. See above.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Positives in <code class="docutils literal notranslate"><span class="pre">df</span></code> according to chosen filter as described above.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.immobile_props.filter_fix">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">filter_fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.filter_fix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter for fixed single dye experiments</p>
+<dd><p>Filter for immobilized single dye origami as described in <a class="reference external" href="https://www.biorxiv.org/content/10.1101/2020.05.17.100354v1">spt</a>.
+Positives are groups</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>with a trajectory within the first 5 frames after the start of the measurement</p></li>
+<li><p>and number of trajectories within group lie in 90% interval of all groups</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Immobile properties as calulated by apply_props()</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Positives in <code class="docutils literal notranslate"><span class="pre">df</span></code> according to single dye filter as described above.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.immobile_props.filter_nofix">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">filter_nofix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">NoFrames</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.filter_nofix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter for DNA-PAINT based tracking handle. Under progress…</p>
+<dd><p>Filter for immobilized origami with DNA-PAINT based tracking handle (TH) as described in <a class="reference external" href="https://www.biorxiv.org/content/10.1101/2020.05.17.100354v1">spt</a>.
+Positives are groups</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>with a trajectory within the first 5 frames after the start of the measurement</p></li>
+<li><p>and number localizations within group are greater or equal to 20% of total measurement duration (in frames)</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Immobile properties as calulated by apply_props()</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Positives in <code class="docutils literal notranslate"><span class="pre">df</span></code> according to TH filter as described above.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
-
-<dl class="py function">
-<dt id="spt.immobile_props.fit_Ncomb">
-<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">fit_Ncomb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">centers_init</span></em>, <em class="sig-param"><span class="n">N</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.fit_Ncomb" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="spt.immobile_props.fit_levels">
-<code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">fit_levels</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">centers_init</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.fit_levels" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="py function">
 <dt id="spt.immobile_props.get_NgT">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_NgT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_NgT" title="Permalink to this definition">¶</a></dt>
-<dd><p>Combine get_taubs and taubs_to_NgT to return NgT as pd.Series. Additionaly return longest trajectory in trace as tau_max.</p>
+<dd><p>Combine get_taubs() and tracks_greaterT() to return TPP as pd.Series for one group.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Input equivalent to get_taubs().</p></li>
+<li><p>Output equivalent to tracks_greaterT()[0].</p></li>
+</ul>
+</div></blockquote>
+<p>The function assumes that there is only one group in the localization list!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Grouped localization list, i.e._picked.hdf5 as in <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a></p></li>
+<li><p><strong>ignore</strong> (<em>int=1</em>) – Maximum interruption (frames) allowed to be regarded as one bright time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Index consists of a combination of one of the following letters and T in frames.</p>
+<ul class="simple">
+<li><p>n: Number of tracks longer or equal to T, i.e. TPP as in <a class="reference external" href="https://www.biorxiv.org/content/10.1101/2020.05.17.100354v1">spt</a></p></li>
+<li><p>s: Mean 1st frame of tracks longer or equal to T.</p></li>
+<li><p>p: Mean photons of tracks longer or equal to T.</p></li>
+<li><p>e: Mean relative standard deviation of photons of tracks longer or equal to T.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.immobile_props.get_props">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_props" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Wrapper function to combine:</dt><dd><ul class="simple">
-<li><p>get_NgT(df,Ts,ignore)</p></li>
-<li><p>get_start(df,ignore)</p></li>
+<dd><p>Combination of get_NgT(df,ignore) and get_start(df,ignore) and get_var(df).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Grouped localization list, i.e. _picked.hdf5 as in <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a></p></li>
+<li><p><strong>ignore</strong> (<em>int=1</em>) – Maximum interruption (frames) allowed to be regarded as one bright time.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Concatenated output of get_NgT(df,ignore) and get_start(df,ignore) and get_var(df).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
 </dl>
-<p>args:</p>
-<p>returns:</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.immobile_props.get_start">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_start</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_start" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get occurence of first localization in group and number of consecutive on frames starting from frame=0.</p>
+<dd><p>For a list of <code class="docutils literal notranslate"><span class="pre">ignore</span></code> values, was there a bright time at the start of the measurement and of which duration?
+That means for</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ignore=2</span></code> and the first bright time starting at frame=3 there was NO bright time</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ignore=3</span></code> and the first bright time starting at frame=3 there was a bright time of finite duration.</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Grouped localization list, i.e. _picked.hdf5 as in <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a></p></li>
+<li><p><strong>ignore</strong> (<em>list</em>) – List of maximum interruption (frames) allowed to be regarded as one bright time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Index has format <code class="docutils literal notranslate"><span class="pre">Tstart-i%i'%(ignore)</span></code>.
+The value is the duration of the bright time at start of measurement if it happened within <code class="docutils literal notranslate"><span class="pre">ignore</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.immobile_props.get_taubs">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_taubs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">ignore</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_taubs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return array of bright times and corresponding 1st frame of each bright event of for trace of a group.</p>
+<dd><p>Get bright time distribution, i.e. the intervals of continuous localizations only interrupted
+by <code class="docutils literal notranslate"><span class="pre">ignore</span></code> for one group and additional properties of each bright time. I.e. a bright time
+corresponds to one trajectory in terms of single particle tracking. The function assumes
+that there is only one group in the localization list!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Grouped localization list, i.e._picked.hdf5 as in <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a></p></li>
+<li><p><strong>ignore</strong> (<em>int=1</em>) – Maximum interruption (frames) allowed to be regarded as one bright time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>[0](numpy.array): Bright times only interrupted by <code class="docutils literal notranslate"><span class="pre">ignore</span></code></p></li>
+<li><p>[1](numpy.array): 1st frame of each bright time</p></li>
+<li><p>[2](numpy.array): Mean photon values of each bright time</p></li>
+<li><p>[3](numpy.array): Relative standard deviation of photons of each bright time</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.immobile_props.get_trace">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_trace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">NoFrames</span></em>, <em class="sig-param"><span class="n">field</span><span class="o">=</span><span class="default_value">'net_gradient'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_trace" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get intensity vs time trace of length=NoFrames for group.</p>
+<dd><p>Get continuous field vs. time trace of length=NoFrames for one group. The function assumes that
+there is only one group in the localization list!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Grouped localization list, i.e. _picked.hdf5 as in <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a></p></li>
+<li><p><strong>NoFrames</strong> (<em>int</em>) – Length of measurement in frames of corresponding raw movie.</p></li>
+<li><p><strong>field</strong> (<em>str</em>) – Column name in df, e.g. ‘photons’ for intensity vs. time trace.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Trace, e.g. continuous field vs. time trace of length=NoFrames for one group</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.immobile_props.get_var">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">get_var</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.get_var" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get various properties for each group of picked localizations.</p>
+<dd><p>Get various properties for one group in _picked.hdf5 as in <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Picked localizations (see picasso.render)</p>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Grouped localization list, i.e. _picked.hdf5 as in <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a></p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>index: Means of all columns in df, plus:</dt><dd><p>’n_locs’:      Number of localizations
-‘photons’:     Not mean but median!
-‘std_photons’: Standard deviation of photons.
-‘bg’:          Background photons. Not mean but median!
-‘sx’:          Standard deviation of group in ‘x’
-‘sy’:          Standard deviation of group in ‘y’
-‘min_frame’:   Mimimum in frames
-‘max_frame’:   Maximum in frames
-‘len’:         max_frame-min_frame (see above)</p>
-</dd>
-</dl>
+<dd class="field-even"><p><p>Indices are means of all columns in <code class="docutils literal notranslate"><span class="pre">df</span></code> plus …</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n_locs</span></code>:      Number of localizations</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">photons</span></code>:     Not mean but median!</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">std_photons</span></code>: Standard deviation of photons.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bg</span></code>:          Background photons. Not mean but median!</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sx</span></code>:          Standard deviation of group in <code class="docutils literal notranslate"><span class="pre">x</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sy</span></code>:          Standard deviation of group in <code class="docutils literal notranslate"><span class="pre">y</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min_frame</span></code>:   Mimimum in frames</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_frame</span></code>:   Maximum in frames</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">len</span></code>:         max_frame-min_frame (see above)</p></li>
+</ul>
+</div></blockquote>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>s_out(pandas.Series)</p>
+<dd class="field-odd"><p>pandas.Series</p>
 </dd>
 </dl>
 </dd></dl>
@@ -412,38 +599,31 @@ various partitions.</p>
 <dl class="py function">
 <dt id="spt.immobile_props.main">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locs</span></em>, <em class="sig-param"><span class="n">info</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cluster detection (pick) in localization list by thresholding in number of localizations per cluster.
-Cluster centers are determined by creating images of localization list with set oversampling.</p>
+<dd><p>Get immobile properties for each group in _picked.hdf5 file (see <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a>) and filter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>locs</strong> (<em>pd.Dataframe</em>) – Picked localizations as created by picasso render</p></li>
-<li><p><strong>info</strong> (<em>list</em><em>(</em><em>dict</em><em>)</em>) – Info to picked localizations</p></li>
+<li><p><strong>locs</strong> (<em>pandas.DataFrame</em>) – Grouped localization list, i.e. _picked.hdf5 as in <a class="reference external" href="https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick">picasso.addon</a></p></li>
+<li><p><strong>info</strong> (<em>list</em>) – Info _picked.yaml to _picked.hdf5 localizations as list of dictionaries.</p></li>
 <li><p><strong>path</strong> (<em>str</em>) – Path to _picked.hdf5 file.</p></li>
 </ul>
 </dd>
-</dl>
-<dl>
-<dt><a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>ignore(int=1):             Ignore value for bright frame
-parallel(bool=True):       Apply parallel computing using dask?</p>
-<blockquote>
-<div><p>Dask cluster should be set up and running for best performance!</p>
-</div></blockquote>
-<p>filter(string=’paint’):    Which filter to use, either None, ‘th’ or ‘sd’ or ‘none’
-save_picked(bool=False):   If true _picked file containing just groups that passed filter will be saved under _picked_valid</p>
+<dt class="field-even">Keyword Arguments</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ignore</strong> (<em>int=1</em>) – Maximum interruption (frames) allowed to be regarded as one bright time.</p></li>
+<li><p><strong>parallel</strong> (<em>bool=True</em>) – Apply parallel computing using DASK? Local cluster should be started before according to cluster_setup_howto()</p></li>
+<li><p><strong>filter</strong> (<em>string='th'</em>) – Which filter to use, either None, ‘th’ or ‘sd’ or ‘none’</p></li>
+</ul>
 </dd>
-</dl>
-<dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>Dict of <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs passed to function.
-list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
-<blockquote>
-<div><p>Will be saved with extension ‘_picked_tprops.hdf5’ for usage in picasso.filter</p>
-</div></blockquote>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>[0](dict):             Dict of keyword arguments passed to function.</p></li>
+<li><p>[1](pandas.DataFrame): Immobile properties of each group in <code class="docutils literal notranslate"><span class="pre">locs</span></code> as calulated by apply_props()</p></li>
+</ul>
 </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list[0](dict)</p>
+<dd class="field-even"><p>list</p>
 </dd>
 </dl>
 </dd></dl>
@@ -451,7 +631,37 @@ list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
 <dl class="py function">
 <dt id="spt.immobile_props.tracks_greaterT">
 <code class="sig-prename descclassname">spt.immobile_props.</code><code class="sig-name descname">tracks_greaterT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">track_length</span></em>, <em class="sig-param"><span class="n">track_start</span></em>, <em class="sig-param"><span class="n">track_photons</span></em>, <em class="sig-param"><span class="n">track_photons_std</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.immobile_props.tracks_greaterT" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return number of bright times greater than Ts as array of len(Ts).</p>
+<dd><p>Get number of trajectories (bright times) per particle (group or pick) greater or equal to T, i.e. TPP in <a class="reference external" href="https://www.biorxiv.org/content/10.1101/2020.05.17.100354v1">spt</a>.
+The function takes returns of get_taubs() as input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>track_length</strong> (<em>numpy.array</em>) – Trajectory durations or bright times only interrupted by <code class="docutils literal notranslate"><span class="pre">ignore</span></code>. See get_taubs().</p></li>
+<li><p><strong>track_start</strong> (<em>numpy.array</em>) – 1st frame of each trajectory. See get_taubs().</p></li>
+<li><p><strong>track_photons</strong> (<em>numpy.array</em>) – Mean photon values of each bright time. See get_taubs().</p></li>
+<li><p><strong>track_photons_std</strong> (<em>numpy.array</em>) – Relative standard deviation of photons of each bright time. See get_taubs().</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul>
+<li><p>[0](pandas.Series): Index consists of a combination of one of the following letters and T in frames.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>n: Number of tracks longer or equal to T, i.e. TPP as in <a class="reference external" href="https://www.biorxiv.org/content/10.1101/2020.05.17.100354v1">spt</a></p></li>
+<li><p>s: Mean 1st frame of tracks longer or equal to T.</p></li>
+<li><p>p: Mean photons of tracks longer or equal to T.</p></li>
+<li><p>e: Mean relative standard deviation of photons of tracks longer or equal to T.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>[1](numpy.array): T in frames</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -611,12 +821,12 @@ Cluster centers are determined by creating images of localization list with set 
 </dd>
 </dl>
 <dl class="simple">
-<dt><a href="#id9"><span class="problematic" id="id10">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)</p>
+<dt><a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)</p>
 </dd>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>Dict of <a href="#id11"><span class="problematic" id="id12">**</span></a>kwargs passed to function.
+<dd class="field-odd"><p><p>Dict of <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs passed to function.
 list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
 <blockquote>
 <div><p>Will be saved with extension ‘_picked_tprops.hdf5’ for usage in picasso.filter</p>

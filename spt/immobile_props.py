@@ -1,24 +1,37 @@
+'''
+.. _picasso.addon:
+    https://picasso-addon.readthedocs.io/en/latest/howto.html#autopick
+.. _spt:
+    https://www.biorxiv.org/content/10.1101/2020.05.17.100354v1
+'''
+
 import os
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import sys
 import dask.dataframe as dd
+
 import multiprocessing as mp
 import time
-# import hdbscan
-from scipy.optimize import curve_fit
 import warnings
 warnings.filterwarnings("ignore")
 
 import picasso_addon.io as addon_io
-import spt.analytic_expressions as express
-
 
 #%%
 def get_trace(df,NoFrames,field='net_gradient'):
     '''
-    Get intensity vs time trace of length=NoFrames for group.
+    Get continuous field vs. time trace of length=NoFrames for one group. The function assumes that
+    there is only one group in the localization list!
+    
+    Args:
+        df(pandas.DataFrame): Grouped localization list, i.e. _picked.hdf5 as in `picasso.addon`_
+        NoFrames(int):        Length of measurement in frames of corresponding raw movie.
+        field(str):           Column name in df, e.g. 'photons' for intensity vs. time trace.
+        
+    Returns:
+        numpy.array: Trace, e.g. continuous field vs. time trace of length=NoFrames for one group
     '''
     
     df[field]=df[field].abs() # Get absolute values of field
@@ -31,7 +44,20 @@ def get_trace(df,NoFrames,field='net_gradient'):
 #%%
 def get_taubs(df,ignore=1):
     '''
-    Return array of bright times and corresponding 1st frame of each bright event of for trace of a group.
+    Get bright time distribution, i.e. the intervals of continuous localizations only interrupted 
+    by ``ignore`` for one group and additional properties of each bright time. I.e. a bright time 
+    corresponds to one trajectory in terms of single particle tracking. The function assumes 
+    that there is only one group in the localization list!
+    
+    Args:
+        df(pandas.DataFrame): Grouped localization list, i.e._picked.hdf5 as in `picasso.addon`_ 
+        ignore(int=1):        Maximum interruption (frames) allowed to be regarded as one bright time.
+    Returns:
+        list:
+        - [0](numpy.array): Bright times only interrupted by ``ignore``
+        - [1](numpy.array): 1st frame of each bright time
+        - [2](numpy.array): Mean photon values of each bright time
+        - [3](numpy.array): Relative standard deviation of photons of each bright time
     '''
     locs_trace=df.loc[:,['frame','photons']].sort_values(by=['frame']) # Get subset of df sort by frame
     ### Get ...
@@ -85,7 +111,23 @@ def tracks_greaterT(track_length,
                     track_photons,
                     track_photons_std):
     '''
-    Return number of bright times greater than Ts as array of len(Ts).
+    Get number of trajectories (bright times) per particle (group or pick) greater or equal to T, i.e. TPP in `spt`_.
+    The function takes returns of get_taubs() as input.
+    
+    Args:
+        track_length(numpy.array): Trajectory durations or bright times only interrupted by ``ignore``. See get_taubs().
+        track_start(numpy.array):  1st frame of each trajectory. See get_taubs().
+        track_photons(numpy.array): Mean photon values of each bright time. See get_taubs().
+        track_photons_std(numpy.array): Relative standard deviation of photons of each bright time. See get_taubs().
+    Returns:
+        list:
+        - [0](pandas.Series): Index consists of a combination of one of the following letters and T in frames.
+        
+            - n: Number of tracks longer or equal to T, i.e. TPP as in `spt`_
+            - s: Mean 1st frame of tracks longer or equal to T.
+            - p: Mean photons of tracks longer or equal to T.
+            - e: Mean relative standard deviation of photons of tracks longer or equal to T.
+        - [1](numpy.array): T in frames
     '''
     ### Define Ts
     Ts=np.concatenate((np.arange(1,50,1),
@@ -129,7 +171,24 @@ def tracks_greaterT(track_length,
 #%%
 def get_NgT(df,ignore=1):
     '''
-    Combine get_taubs and taubs_to_NgT to return NgT as pd.Series. Additionaly return longest trajectory in trace as tau_max.
+    Combine get_taubs() and tracks_greaterT() to return TPP as pd.Series for one group.
+    
+        * Input equivalent to get_taubs().
+        * Output equivalent to tracks_greaterT()[0].
+        
+    The function assumes that there is only one group in the localization list!
+    
+    Args:     
+        df(pandas.DataFrame): Grouped localization list, i.e._picked.hdf5 as in `picasso.addon`_
+        ignore(int=1):        Maximum interruption (frames) allowed to be regarded as one bright time.
+    Returns:
+        pandas.Series:
+            Index consists of a combination of one of the following letters and T in frames.
+            
+            - n: Number of tracks longer or equal to T, i.e. TPP as in `spt`_
+            - s: Mean 1st frame of tracks longer or equal to T.
+            - p: Mean photons of tracks longer or equal to T.
+            - e: Mean relative standard deviation of photons of tracks longer or equal to T.
     '''
     
     taubs,start_frames,taubs_photons,taubs_photons_err=get_taubs(df,ignore)
@@ -143,7 +202,19 @@ def get_NgT(df,ignore=1):
 #%%
 def get_start(df,ignore):
     '''
-    Get occurence of first localization in group and number of consecutive on frames starting from frame=0.
+    For a list of ``ignore`` values, was there a bright time at the start of the measurement and of which duration?
+    That means for
+    
+        - ``ignore=2`` and the first bright time starting at frame=3 there was NO bright time
+        - ``ignore=3`` and the first bright time starting at frame=3 there was a bright time of finite duration.
+    
+    Args:
+        df(pandas.DataFrame): Grouped localization list, i.e. _picked.hdf5 as in `picasso.addon`_
+        ignore(list):         List of maximum interruption (frames) allowed to be regarded as one bright time.
+    Returns:
+        pandas.Series: 
+            Index has format ``Tstart-i%i'%(ignore)``.
+            The value is the duration of the bright time at start of measurement if it happened within ``ignore``.
     '''
     ### First frame in localizations
     min_frame=df['frame'].min() # First localization in group
@@ -166,22 +237,23 @@ def get_start(df,ignore):
 #%%
 def get_var(df):
     '''
-    Get various properties for each group of picked localizations.
+    Get various properties for one group in _picked.hdf5 as in `picasso.addon`_.
     
-    args:
-        df(pandas.DataFrame):  Picked localizations (see picasso.render)
-
-    returns:
-        s_out(pandas.Series): index: Means of all columns in df, plus:
-                                'n_locs':      Number of localizations
-                                'photons':     Not mean but median!
-                                'std_photons': Standard deviation of photons.
-                                'bg':          Background photons. Not mean but median!
-                                'sx':          Standard deviation of group in 'x'
-                                'sy':          Standard deviation of group in 'y'
-                                'min_frame':   Mimimum in frames
-                                'max_frame':   Maximum in frames
-                                'len':         max_frame-min_frame (see above)
+    Args:
+        df(pandas.DataFrame): Grouped localization list, i.e. _picked.hdf5 as in `picasso.addon`_
+    Returns:
+        pandas.Series: 
+            Indices are means of all columns in ``df`` plus ...
+            
+                - ``n_locs``:      Number of localizations
+                - ``photons``:     Not mean but median!
+                - ``std_photons``: Standard deviation of photons.
+                - ``bg``:          Background photons. Not mean but median!
+                - ``sx``:          Standard deviation of group in ``x``
+                - ``sy``:          Standard deviation of group in ``y``
+                - ``min_frame``:   Mimimum in frames
+                - ``max_frame``:   Maximum in frames
+                - ``len``:         max_frame-min_frame (see above)
     '''
     ### Get all mean values
     s_out=df.mean()
@@ -205,127 +277,15 @@ def get_var(df):
     return s_out
 
 #%%
-def fit_Ncomb(x,y,centers_init,N):
-    
-    ### Prepare start parameters for fit
-    p0=[]
-    p0.extend([centers_init[0]])
-    p0.extend([p0[0]/4])
-    p0.extend([max(y) for i in range(N)])
-    
-    ### Define comb of N gaussians
-    def gauss_comb(x,*p): return express.gauss_Ncomb(x,p,N)
-    
-    def redchi(x,y,p):
-        yopt=gauss_comb(x,*p) # Get reduced chi
-        chi=np.divide((yopt-y)**2,y)
-        chi=chi[np.isfinite(chi)]
-        chi=np.sum(chi)/(len(chi)-len(p))
-        return chi
-    
-    ### Fit
-    levels=np.zeros(4+6)
-    try:
-        ### Try first cluster peak as start parameter
-        popt0,pcov=curve_fit(gauss_comb,x,y,p0=p0)
-        popt0=np.absolute(popt0)
-        
-        ### Try second cluster peak as start parameter
-        p0[0]=centers_init[1]
-        popt1,pcov=curve_fit(gauss_comb,x,y,p0=p0)
-        popt1=np.absolute(popt1)
-        
-        ### Select better chi fit
-        if redchi(x,y,popt0)<redchi(x,y,popt1): popt=popt0
-        else: popt=popt1
-        
-        ### Try half of first cluster peak
-        p0[0]=centers_init[0]/2
-        popt3,pcov=curve_fit(gauss_comb,x,y,p0=p0)
-        popt3=np.absolute(popt3)
-        
-        ### Select better chi fit
-        if redchi(x,y,popt3)<redchi(x,y,popt): popt=popt3
-        
-    except:
-        levels[0]=N
-        levels[1]=np.nan # set chi to nan
-        return levels
-   
-    ### Remove peaks outside of data range
-    centers=np.array([(i+1)*popt[0] for i in range(N)]) # Location of ith peak
-    popt[2:][centers>=max(x)]=0 #Assign zeros to out of range
-    
-    ### Set peaks with an amplitude lower than 1% than the peak amplitude to zero
-    Acrit=0.01*max(popt[2:])
-    popt[2:][popt[2:]<Acrit]=0
-     
-    ### Now calculate fit reduced chi
-    chi=redchi(x,y,popt)
-    
-    ### Assign to end result
-    levels[0]=N
-    levels[1]=chi
-    levels[2:2+len(popt)]=popt
-    
-    return levels
-        
-#%%
-def fit_levels(data,centers_init):
-     
-    ### Prepare data for fit
-    y,x=np.histogram(data,
-                     bins='auto',
-                     )
-    x=x[:-1]+(x[1]-x[0])/2
-    
-    ### Fit comb of Gaussians for different number of levels
-    fits=np.zeros((10,6))
-    for N in range(1,7):
-        fits[:,N-1]=fit_Ncomb(x,y,centers_init,N) 
-    
-    ########## Decide on the appropriate number of levels based on following criteria
-    levels=fits.copy()
-    
-    ### 1. Set chi value of fits having two extrema within peak amplitudes to NaN
-    for i in range(np.shape(levels)[1]):
-        diff_sign=np.sign(np.diff(levels[4:,i]))
-        diff_sign=diff_sign[diff_sign!=0]
-        n_maxima=np.sum(np.absolute(np.diff(diff_sign))==2)
-        if n_maxima>2: levels[1,i]=np.nan
-    
-    ### 2. Remove NaNs in chi, corresponding to not succesful fits
-    levels=levels[:,np.isfinite(levels[1,:])]
-    
-    ### 3. Search for k with minimum reduced chisquare, go back in ks and return value where first jump bigger than 10% occurs
-    k=np.argmin(levels[1,:])
-    chis=levels[1,:]
-    if k>0:
-        for i in range(k,0,-1):
-            if np.absolute((chis[i]-chis[i-1])/chis[i-1])>0.1:
-                k=i
-                break
-    
-    ### After decision was made prepare return
-    N=int(levels[0,k])
-    
-    pN=levels[2:2+2+N,k]
-    yopt=express.gauss_Ncomb(x,pN,N)
-    
-    N=np.sum(levels[4:,k]>0)
-    
-    return N,x,y,yopt,fits
-
-#%%
 def get_props(df,ignore=1):
     """ 
-    Wrapper function to combine:
-        - get_NgT(df,Ts,ignore)
-        - get_start(df,ignore)
+    Combination of get_NgT(df,ignore) and get_start(df,ignore) and get_var(df).
     
-    args:
-        
-    returns:
+    Args:
+        df(pandas.DataFrame): Grouped localization list, i.e. _picked.hdf5 as in `picasso.addon`_
+        ignore(int=1):        Maximum interruption (frames) allowed to be regarded as one bright time.
+    Returns:
+        pandas.Series:       Concatenated output of get_NgT(df,ignore) and get_start(df,ignore) and get_var(df).
         
     """
     
@@ -344,7 +304,14 @@ def get_props(df,ignore=1):
 def apply_props(df,
                 ignore=1):
     """ 
-          
+    Group _picked.hdf5 by groups (i.e. picks in `picasso.addon`_) and 
+    apply get_props() to each group to get immobile properties as in `spt`_.
+    
+    Args:
+        df(pandas.DataFrame): Grouped localization list, i.e. _picked.hdf5 as in `picasso.addon`_
+        ignore(int=1):        Maximum interruption (frames) allowed to be regarded as one bright time.
+    Returns:
+        pandas.DataFrame:     Output of get_props() for each group in ``df`` (groupby-apply approach).
     """
     tqdm.pandas() # For progressbar under apply
     df_props = df.groupby('group').progress_apply(lambda df: get_props(df,ignore))
@@ -357,8 +324,14 @@ def apply_props(df,
 def apply_props_dask(df,
                     ignore=1): 
     """
-    Applies pick_props.get_props(df,NoFrames,ignore) to each group in parallelized manner using dask by splitting df into 
-    various partitions.
+    Same as apply_props() but in parallelized version using DASK by partitioning df. 
+    Local DASK cluster has to be started manually for efficient computation, see cluster_setup_howto().
+    
+    Args:
+        df(pandas.DataFrame): Grouped localization list, i.e. _picked.hdf5 as in `picasso.addon`_
+        ignore(int=1):        Maximum interruption (frames) allowed to be regarded as one bright time.
+    Returns:
+        pandas.DataFrame:     Output of get_props() for each group in ``df`` (groupby-apply approach).
     """
     
     ### Define groupby.apply function for dask which will be applied to different partitions of df
@@ -378,6 +351,12 @@ def apply_props_dask(df,
 
 #%%
 def cluster_setup_howto():
+    '''
+    Print instruction howto start a DASK local cluster for efficient computation of apply_props_dask().
+    Fixed ``scheduler_port=8787`` is used to easily reconnect to cluster once it was started.
+    
+    '''
+
     print('Please first start a DASK LocalCluster by running following command in directly in IPython shell:')
     print()
     print('Client(n_workers=max(1,int(0.8 * mp.cpu_count())),')
@@ -390,7 +369,16 @@ def cluster_setup_howto():
 #%%
 def filter_fix(df):
     """ 
-    Filter for fixed single dye experiments    
+    Filter for immobilized single dye origami as described in `spt`_.
+    Positives are groups 
+    
+        - with a trajectory within the first 5 frames after the start of the measurement
+        - and number of trajectories within group lie in 90% interval of all groups
+    
+    Args:
+        df(pandas.DataFrame): Immobile properties as calulated by apply_props()
+    Returns:
+        pandas.DataFrame: Positives in ``df`` according to single dye filter as described above.
     """            
     ### Localization within first 5 frames condition
     istrue = df.min_frame<=5
@@ -406,8 +394,17 @@ def filter_fix(df):
 #%%
 def filter_nofix(df,NoFrames):
     """ 
-    Filter for DNA-PAINT based tracking handle. Under progress...
-    """
+    Filter for immobilized origami with DNA-PAINT based tracking handle (TH) as described in `spt`_.
+    Positives are groups 
+    
+        - with a trajectory within the first 5 frames after the start of the measurement
+        - and number localizations within group are greater or equal to 20% of total measurement duration (in frames)
+    
+    Args:
+        df(pandas.DataFrame): Immobile properties as calulated by apply_props()
+    Returns:
+        pandas.DataFrame: Positives in ``df`` according to TH filter as described above.
+    """ 
     istrue=df.min_frame<=5            
     istrue=istrue&(df.n_locs/NoFrames>=0.2) # Occupancy of more than 20%
     
@@ -418,7 +415,18 @@ def filter_nofix(df,NoFrames):
 #%%
 def filter_(df,NoFrames,apply_filter=None):
     '''
-    Decide which filter to apply.
+    Decide which filter to apply to the output of get_props(), either:
+        
+        - 'sd' as given by filter_fix()
+        - 'th' as given by filter_nofix()
+        - 'none' if no filter should be applied
+        
+    Args:
+        df(pandas.DataFrame): Immobile properties as calulated by apply_props()
+        NoFrames(int):        Length of measurement in frames of corresponding raw movie.
+        apply_filter(str):    Either 'sd','th' or 'none'. See above.
+    Returns:
+        pandas.DataFrame: Positives in ``df`` according to chosen filter as described above.
     '''
     if apply_filter=='sd':
         df_filter=filter_fix(df)
@@ -436,26 +444,24 @@ def filter_(df,NoFrames,apply_filter=None):
 #%%
 def main(locs,info,path,**params):
     '''
-    Cluster detection (pick) in localization list by thresholding in number of localizations per cluster.
-    Cluster centers are determined by creating images of localization list with set oversampling.
+    Get immobile properties for each group in _picked.hdf5 file (see `picasso.addon`_) and filter.
     
     
-    args:
-        locs(pd.Dataframe):        Picked localizations as created by picasso render
-        info(list(dict)):          Info to picked localizations
+    Args:
+        locs(pandas.DataFrame):    Grouped localization list, i.e. _picked.hdf5 as in `picasso.addon`_
+        info(list):                Info _picked.yaml to _picked.hdf5 localizations as list of dictionaries.
         path(str):                 Path to _picked.hdf5 file.
         
-    **kwargs: If not explicitly specified set to default, also when specified as None
-        ignore(int=1):             Ignore value for bright frame
-        parallel(bool=True):       Apply parallel computing using dask? 
-                                   Dask cluster should be set up and running for best performance!
-        filter(string='paint'):    Which filter to use, either None, 'th' or 'sd' or 'none'
-        save_picked(bool=False):   If true _picked file containing just groups that passed filter will be saved under _picked_valid
+    Keyword Args:
+        ignore(int=1):             Maximum interruption (frames) allowed to be regarded as one bright time.
+        parallel(bool=True):       Apply parallel computing using DASK? Local cluster should be started before according to cluster_setup_howto()
+        filter(string='th'):       Which filter to use, either None, 'th' or 'sd' or 'none'
     
-    return:
-        list[0](dict):             Dict of **kwargs passed to function.
-        list[1](pandas.DataFrame): Kinetic properties of all groups.
-                                   Will be saved with extension '_picked_tprops.hdf5' for usage in picasso.filter
+    Returns:
+        list:
+            
+        - [0](dict):             Dict of keyword arguments passed to function.
+        - [1](pandas.DataFrame): Immobile properties of each group in ``locs`` as calulated by apply_props()
     '''
     
     ### Path of file that is processed and number of frames
@@ -465,8 +471,7 @@ def main(locs,info,path,**params):
     ### Define standard 
     standard_params={'ignore':1,
                      'parallel':True,
-                     'filter':'paint',
-                     'save_picked':False,
+                     'filter':'th',
                      }
     ### Set standard if not contained in params
     for key, value in standard_params.items():
@@ -514,22 +519,5 @@ def main(locs,info,path,**params):
                        locs_props,
                        info_props,
                        mode='picasso_compatible')
-    
-    
-    ##################################### Optional saving of reduced _locs_picked file
-    if params['save_picked']: 
-        ### Reduce _locs to remaining groups in _props
-        groups=locs_props.group.values
-        locs_filter=locs.query('group in @groups')
-        
-        info_filter=info.copy()+[params]
-        
-        ### Save
-        addon_io.save_locs(path+'_valid.hdf5',
-                           locs_filter,
-                           info_filter,
-                           mode='picasso_compatible')
-    else:
-        locs_filter=locs.copy()
-        
-    return [params,locs_props,locs_filter]
+           
+    return [params,locs_props]
