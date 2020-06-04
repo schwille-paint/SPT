@@ -1,3 +1,9 @@
+'''
+.. _tejedor:
+    https://www.cell.com/biophysj/fulltext/S0006-3495(09)06097-4
+.. _kowalek:
+    https://journals.aps.org/pre/abstract/10.1103/PhysRevE.100.032410
+'''
 import numpy as np
 import numba
 
@@ -5,7 +11,29 @@ import numba
 @numba.jit(nopython=True,nogil=True,cache=True)
 def displacement_moments(t,x,y):
     '''
-
+    Numba optimized calulation of trajectory ``(t,x,y)`` moments. Calulation accounts for short gaps, i.e. missed localizations 
+    recovered by allowed ``memory`` values. Moments are only calulated up to maximum lag time of ``l_max = 0.25*N`` with ``N=len(t)``.
+    Calulated moments are:
+        
+        - Mean square displacement (MSD)
+        - Mean displacement moment of 4th order (MSD corresponds to 2nd order)
+        - Mean maximal excursion of 2nd order (MME)
+        - Mean maximal excursion of 4th order
+    
+    MME is calculated according to: Vincent Tejedor, Biophysical Journal, 98, 7, 2010 (tejedor_)
+    
+    Args:
+        t(np.array): time
+        x(np.array): x-position
+        y(np.array): y-position
+    Returns:
+        np.array of size ``(l_max,5)``:
+            
+            - ``[:,0]``: lag time
+            - ``[:,1]``: MSD
+            - ``[:,2]``: Mean displacement moment of 4th order
+            - ``[:,3]``: MME
+            - ``[:,4]``: Mean maximal excursion of 4th order
     '''
     N=t[-1]-t[0]+1 # Trajectory length
     max_lag=int(np.floor(0.25*N)) # Set maximum lagtime to 0.25*trajectory length
@@ -53,7 +81,12 @@ def displacement_moments(t,x,y):
 @numba.jit(nopython=True,nogil=True,cache=True)
 def msd_ratio(moments):
     '''
-    MSD ratio (classifier H.) according to P. Kowalek, Physical Review E, 100, 2019.
+    MSD ratio (classifier H.) according to P. Kowalek, Physical Review E, 100, 2019 (kowalek_).
+    
+    Args:
+        moments(np.array): Return of displacement_moments(t,x,y)
+    Returns:
+        float: MSD ratio
     '''
     moments=moments[moments[:,1]!=0,:]
     kappa=np.nanmean(moments[:-1,1]/moments[1:,1]-moments[:-1,0]/moments[1:,0])
@@ -64,7 +97,13 @@ def msd_ratio(moments):
 @numba.jit(nopython=True,nogil=True,cache=True)
 def straightness(x,y):
     '''
-    Straightness (classifier I.) according to P. Kowalek, Physical Review E, 100, 2019.
+    Straightness (classifier I.) according to P. Kowalek, Physical Review E, 100, 2019 (kowalek_).
+    
+    Args:
+        x(np.array): x-positions of trajectory
+        y(np.array): y-positions of trajectory
+    Returns:
+        float: Straightness
     '''
     ### One dimensional jumps
     dx=x[1:]-x[:-1]

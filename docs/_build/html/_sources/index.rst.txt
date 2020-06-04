@@ -20,7 +20,7 @@ This package provides a complete single particle tracking analysis workflow base
 - Easy to use script batch processing
 
 SPT requires the following packages:
-    - `picasso`_  :  Localization and rendering of super-reolution images
+    - `picasso`_  :  Localization and rendering of super-resolution images
     - `picasso_addon`_ : Further functionalities for picasso (auto net-gradient, autopick)
 
 .. image:: files/software-immob.png

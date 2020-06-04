@@ -24,8 +24,8 @@ locs,info=io.load_locs(path)
 locs=pd.DataFrame(locs)
 
 ######################################## Parameter scan for linking
-search_range=[2,3,5,7]
-memory=[1,2,3,4]
+search_range=[2,5]
+memory=[2,3]
 #### Get scan results    
 scan_results=linklocs.scan_sr_mem(locs,
                                   info,

@@ -101,7 +101,7 @@ def fit_msd_free_iterative(lagtimes,msd,lp,max_it=5):
         
         ### Update optimal track length to be fitted
         try:
-            p_update=int(np.ceil(2+2.7*x**0.5))
+            p_update=int(np.round(2+2.3*x**0.52))
             if p_update<=2:
                 p_update=2
             p=p+[p_update]

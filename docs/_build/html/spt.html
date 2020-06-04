@@ -172,22 +172,26 @@
 <span class="target" id="module-spt.analytic_expressions"></span><dl class="py function">
 <dt id="spt.analytic_expressions.ecdf">
 <code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">ecdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.ecdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate experimental continuous distribution function (ECDF) of random variable x
-so that counts(value)=probability(x&gt;=value). I.e last value of counts=1.</p>
+<dd><p>Calculate experimental continuous distribution function (ECDF), i.e. no binning, of random variable x
+so that ECDF(value)=probability(x&gt;=value). I.e first value of counts=1.</p>
 <dl class="simple">
-<dt>Equivalent to :</dt><dd><p>matplotlib.pyplot.hist(tau_dist,bins=numpy.unique(tau_dist),normed=True,cumulative=True)</p>
+<dt>Equivalent to inverse of:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.hist(tau_dist,bins=numpy.unique(tau_dist),normed=True,cumulative=True)</span></code>
+but with non-equidistant binning, but bins are chosen according to unique values in x.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em>) – 1 dimensional array of random variable</p>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.array</em>) – 1 dimensional array of random variable</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>values</strong> (<em>numpy.ndarray</em>) – Bins of ECDF corresponding to unique values of x.</p></li>
-<li><p><strong>counts</strong> (<em>numpy.ndarray</em>) – counts(value)=probability(x&lt;=value).</p></li>
+<li><p>[0](numpy.array): Bins of ECDF corresponding to unique values of x.</p></li>
+<li><p>[1](numpy.array): ECDF(value)=probability(x&gt;=value).</p></li>
 </ul>
 </p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
 </dd>
 </dl>
 </dd></dl>
@@ -195,47 +199,56 @@ so that counts(value)=probability(x&gt;=value). I.e last value of counts=1.</p>
 <dl class="py function">
 <dt id="spt.analytic_expressions.exp_tracks_per_frame">
 <code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">exp_tracks_per_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.exp_tracks_per_frame" title="Permalink to this definition">¶</a></dt>
-<dd><p>Exponential like decay to fit number of tracks per frame: NoTracks=a*np.exp(-x/b)+c</p>
+<dd><p>Exponential like decay to fit number of tracks per frame: <code class="docutils literal notranslate"><span class="pre">NoTracks=a*np.exp(-x/b)+c</span></code></p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.analytic_expressions.gauss_1D">
 <code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">gauss_1D</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">x0</span></em>, <em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">A</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.gauss_1D" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>A</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>x0</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>sigma</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>DESCRIPTION.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>y (TYPE)</p>
-</dd>
-</dl>
+<dd><p>Simple 1D non-normalized Gaussian function: <code class="docutils literal notranslate"><span class="pre">y=np.absolute(A)*np.exp(-(x-x0)**2/sigma**2)</span></code></p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.analytic_expressions.gauss_Ncomb">
 <code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">gauss_Ncomb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">p</span></em>, <em class="sig-param"><span class="n">N</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.gauss_Ncomb" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sum of N 1D Gaussian functions, see gauss_1D(x,x0,sigma,A).
+The nth Gaussian function with <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">in</span> <span class="pre">[0,N[</span></code> is:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>centered at multiples of first Gaussian center <code class="docutils literal notranslate"><span class="pre">(n+1)*x0</span></code></p></li>
+<li><p>has a width of <code class="docutils literal notranslate"><span class="pre">sqrt(n+1)*sigma</span></code> assuming Poissonian broadening</p></li>
+<li><p>but decoupled Amplitudes <code class="docutils literal notranslate"><span class="pre">An</span></code></p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.array</em>) – Values at which function is evaluated</p></li>
+<li><p><strong>p</strong> (<em>list</em>) – <code class="docutils literal notranslate"><span class="pre">[x0,sigma,A0,A1,...,AN]</span></code> input parameters for sum of Gaussians (len=N+2)</p></li>
+<li><p><strong>N</strong> (<em>integer</em>) – Number of Gaussian functions that are summed up</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Evaluation of function at <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">p</span></code>, <code class="docutils literal notranslate"><span class="pre">N</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="spt.analytic_expressions.msd_anomal">
 <code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">msd_anomal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau</span></em>, <em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.msd_anomal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Anomalous diffusion: msd=a*tau**b
-According to: Carlo Manzo, Report on Progress in Physics, 78, 2015</p>
+<dd><p>MSD fitting eq. for anomalous diffusion: <code class="docutils literal notranslate"><span class="pre">msd=a*tau**b</span></code>
+According to: Carlo Manzo, Report on Progress in Physics, 78, 2015 (<a class="reference external" href="https://iopscience.iop.org/article/10.1088/0034-4885/78/12/124601">manzo</a>)</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.analytic_expressions.msd_free">
 <code class="sig-prename descclassname">spt.analytic_expressions.</code><code class="sig-name descname">msd_free</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tau</span></em>, <em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analytic_expressions.msd_free" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple brownian diffusion taking loclization precision into account: msd=a*tau+b.
-According to: Xavier Michalet, Physical Review E, 82, 2010</p>
+<dd><p>MSD fitting eq. for simple brownian diffusion taking localization precision into account: <code class="docutils literal notranslate"><span class="pre">msd=a*tau+b</span></code>
+According to: Xavier Michalet, Physical Review E, 82, 2010 (<a class="reference external" href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.82.041914">michalet</a>)</p>
 </dd></dl>
 
 </div>
@@ -671,13 +684,19 @@ The function takes returns of get_taubs() as input.</p>
 <span class="target" id="module-spt.linklocs"></span><dl class="py function">
 <dt id="spt.linklocs.drop_shorttracks">
 <code class="sig-prename descclassname">spt.linklocs.</code><code class="sig-name descname">drop_shorttracks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">crit_len</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.linklocs.drop_shorttracks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper function to remove trajectories shorter than crit_len from picked.</p>
+<dd><p>Remove trajectories shorter than crit_len from output of get_link().</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Trajectories DataFrame (see trackpy.link())</p></li>
-<li><p><strong>crit_len</strong> (<em>int=10</em>) – Trajectories lower than crit_len (frames) will be removed from df</p></li>
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Trajectories pandas.DataFrame, i.e. output of get_link() (see also trackpy.link())</p></li>
+<li><p><strong>crit_len</strong> (<em>int=10</em>) – Trajectories having less localizations than crit_len (frames) will be removed from df</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">df</span></code> with short trajectories &lt; crit_len removed.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -685,26 +704,29 @@ The function takes returns of get_taubs() as input.</p>
 <dl class="py function">
 <dt id="spt.linklocs.get_link">
 <code class="sig-prename descclassname">spt.linklocs.</code><code class="sig-name descname">get_link</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locs</span></em>, <em class="sig-param"><span class="n">search_range</span></em>, <em class="sig-param"><span class="n">memory</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.linklocs.get_link" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply trackpy.link_df on localizations with given search_range and memory to get tracks sorted by group and frame.
+<dd><p>Apply trackpy.link_df() (<a class="reference external" href="http://soft-matter.github.io/trackpy/v0.4.2/">trackpy</a>) on localizations with given search_range and memory to get trajectories sorted by group and frame.
 All tracks shorter or equal to 10 frames are removed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>locs</strong> (<em>pandas.DataFrame</em>) – Localizations loaded with picasso.io.load_locs() as pandas.DataFrame</p></li>
-<li><p><strong>info</strong> (<em>picasso.io</em>) – Info as loaded by picasso.io.load_locs()</p></li>
-<li><p><strong>search_range</strong> (<em>int</em>) – Localizations within search_range (spatial) will be connetcted to tracks (see trackpy.link_df)</p></li>
-<li><p><strong>memory</strong> (<em>int</em>) – Localizations within memory (temporal) will be connetcted to tracks (see trackpy.link_df)</p></li>
+<li><p><strong>locs</strong> (<em>pandas.DataFrame</em>) – Localizations as generated by <a class="reference external" href="https://picassosr.readthedocs.io/en/latest/localize.html">picasso.localize</a>  as pandas.DataFrame</p></li>
+<li><p><strong>info</strong> (<em>picasso.io</em>) – Info _locs.yaml to _locs.hdf5 localizations as list of dictionaries.</p></li>
+<li><p><strong>search_range</strong> (<em>int</em>) – Localizations within search_range (spatial) will be connected to tracks (see trackpy.link_df)</p></li>
+<li><p><strong>memory</strong> (<em>int</em>) – Localizations within memory (temporal) will be connected to tracks (see trackpy.link_df)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>Linked trajecories using trackpy.link() with parameters.</dt><dd><p>All trajectories with &lt;= 10 localizations are already removed!!</p>
-</dd>
-</dl>
+<dd class="field-even"><p><p>Linked trajectories using trackpy.link().</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">group</span></code> instead of <code class="docutils literal notranslate"><span class="pre">particle</span></code> column for <a class="reference external" href="https://picassosr.readthedocs.io/en/latest/render.html">picasso.render</a> compatibility.</p></li>
+<li><p>All trajectories with &lt;= 10 localizations are already removed!!</p></li>
+</ul>
+</div></blockquote>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>link(pandas.DataFrame)</p>
+<dd class="field-odd"><p>pandas.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -712,16 +734,46 @@ All tracks shorter or equal to 10 frames are removed.</p>
 <dl class="py function">
 <dt id="spt.linklocs.main">
 <code class="sig-prename descclassname">spt.linklocs.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locs</span></em>, <em class="sig-param"><span class="n">info</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.linklocs.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function to call get_link in a convenient way with data saving.</p>
+<dd><p>Link localizations using trackpy.link_df() (<a class="reference external" href="http://soft-matter.github.io/trackpy/v0.4.2/">trackpy</a>) on localizations (<a class="reference external" href="https://picassosr.readthedocs.io/en/latest/localize.html">picasso.localize</a>) with given search_range and
+memory to get trajectories sorted by group and frame. All tracks shorter or equal to 10 frames are removed. Trajectories
+will be saved as <code class="docutils literal notranslate"><span class="pre">'_picked%i%i.hdf5'%(search_range,memory)</span></code> with corresponding info as .yaml.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>locs</strong> (<em>pandas.DataFrame</em>) – Localization list, i.e. _locs.hdf5 as in <a class="reference external" href="https://picassosr.readthedocs.io/en/latest/localize.html">picasso.localize</a></p></li>
+<li><p><strong>info</strong> (<em>list</em>) – Info _locs.yaml to _locs.hdf5 localizations as list of dictionaries.</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – Path to _locs.hdf5 file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Keyword Arguments</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>search_range</strong> (<em>int</em>) – Localizations within search_range (spatial) will be connected to tracks (see trackpy.link_df)</p></li>
+<li><p><strong>memory</strong> (<em>int</em>) – Localizations within memory (temporal) will be connected to tracks (see trackpy.link_df)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>[0](dict):             Dict of keyword arguments passed to function.</p></li>
+<li><p>[1](pandas.DataFrame): Trajectories by application of trackpy.link_df(). See above.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.linklocs.plot_scan_results">
 <code class="sig-prename descclassname">spt.linklocs.</code><code class="sig-name descname">plot_scan_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">prox</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.linklocs.plot_scan_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>Quickly plot results of scan_sr_mem().</p>
+<dd><p>Quickly plot results in scan_sr_mem().</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Return DataFrame of scan_sr_mem()</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Return DataFrame of scan_sr_mem()[0].</p></li>
+<li><p><strong>prox</strong> (<em>float</em>) – Return DataFrame of scan_sr_mem()[1].</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -729,25 +781,44 @@ All tracks shorter or equal to 10 frames are removed.</p>
 <dl class="py function">
 <dt id="spt.linklocs.scan_sr_mem">
 <code class="sig-prename descclassname">spt.linklocs.</code><code class="sig-name descname">scan_sr_mem</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locs</span></em>, <em class="sig-param"><span class="n">info</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">sr</span></em>, <em class="sig-param"><span class="n">mem</span></em>, <em class="sig-param"><span class="n">roi</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timewindow</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.linklocs.scan_sr_mem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Quick scan of the trackpy.link algorithm using tuples of searc_hranges and memory
-over center ROI and starting time window of the video. Output and coresponding plot will be saved.</p>
+<dd><p>Quick scan using get_link() (<a class="reference external" href="http://soft-matter.github.io/trackpy/v0.4.2/">trackpy</a>) algorithm using tuples of <code class="docutils literal notranslate"><span class="pre">search_ranges</span></code> and <code class="docutils literal notranslate"><span class="pre">memory</span></code>
+over center ROI and starting time window of the video. Corresponding plot will be saved using plot_scan_results().
+This is implemented in order to quickly estimate optimum linking parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>locs</strong> (<em>pandas.DataFrame</em>) – Localizations loaded with picasso.io.load_locs() as pandas.DataFrame</p></li>
-<li><p><strong>info</strong> (<em>picasso.io</em>) – Info as loaded by picasso.io.load_locs()</p></li>
+<li><p><strong>locs</strong> (<em>pandas.DataFrame</em>) – Localizations as generated by <a class="reference external" href="https://picassosr.readthedocs.io/en/latest/localize.html">picasso.localize</a>  as pandas.DataFrame</p></li>
+<li><p><strong>info</strong> (<em>picasso.io</em>) – Info _locs.yaml to _locs.hdf5 localizations as list of dictionaries.</p></li>
 <li><p><strong>path</strong> (<em>str</em>) – Path to _locs.hdf5 file for saving output</p></li>
 <li><p><strong>sr</strong> (<em>list</em><em>(</em><em>int</em><em>)</em>) – List of search_ranges to scan (see trackpy.link)</p></li>
 <li><p><strong>mem</strong> (<em>list</em><em>(</em><em>int</em><em>)</em>) – List of memory values to scan  (see trackpy.link)</p></li>
-<li><p><strong>roi</strong> (<em>bool=True</em>) – If True scan is performed on cropped video to center 200^2px FOV</p></li>
-<li><p><strong>timewindow</strong> (<em>bool=True</em>) – If True scan is performed on first 300 frames of video only</p></li>
+<li><p><strong>roi</strong> (<em>bool=True</em>) – If True scan is performed on cropped video to <strong>center 200^2 px</strong> FOV</p></li>
+<li><p><strong>timewindow</strong> (<em>bool=True</em>) – If True scan is performed on first <strong>300 frames</strong> of video only</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p><ul>
+<li><p>[0] (pandas.DataFrame): Multi-Index: Tuple (<code class="docutils literal notranslate"><span class="pre">search_range</span></code>, <code class="docutils literal notranslate"><span class="pre">memory</span></code>) with columns:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">len_med</span></code>: Median track length</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">numtracks</span></code>: Number of linked tracks</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">search_range</span></code>: See above</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">memory</span></code>: See above</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>[1] (float):</p>
+<blockquote>
+<div><p>Proximity, i.e. 90% of all nearest neighbor distances between localizations
+corresponding to first 100 frames (full FOV) are greater than proximity (px).</p>
+</div></blockquote>
+</li>
+</ul>
+</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>df_out(pandas.DataFrame)</p>
+<dd class="field-odd"><p>list</p>
 </dd>
 </dl>
 </dd></dl>
@@ -821,12 +892,12 @@ Cluster centers are determined by creating images of localization list with set 
 </dd>
 </dl>
 <dl class="simple">
-<dt><a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)</p>
+<dt><a href="#id6"><span class="problematic" id="id7">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)</p>
 </dd>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>Dict of <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs passed to function.
+<dd class="field-odd"><p><p>Dict of <a href="#id8"><span class="problematic" id="id9">**</span></a>kwargs passed to function.
 list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
 <blockquote>
 <div><p>Will be saved with extension ‘_picked_tprops.hdf5’ for usage in picasso.filter</p>
@@ -846,18 +917,77 @@ list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
 <span class="target" id="module-spt.motion_metrics"></span><dl class="py function">
 <dt id="spt.motion_metrics.displacement_moments">
 <code class="sig-prename descclassname">spt.motion_metrics.</code><code class="sig-name descname">displacement_moments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.motion_metrics.displacement_moments" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Numba optimized calulation of trajectory <code class="docutils literal notranslate"><span class="pre">(t,x,y)</span></code> moments. Calulation accounts for short gaps, i.e. missed localizations
+recovered by allowed <code class="docutils literal notranslate"><span class="pre">memory</span></code> values. Moments are only calulated up to maximum lag time of <code class="docutils literal notranslate"><span class="pre">l_max</span> <span class="pre">=</span> <span class="pre">0.25*N</span></code> with <code class="docutils literal notranslate"><span class="pre">N=len(t)</span></code>.
+Calulated moments are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Mean square displacement (MSD)</p></li>
+<li><p>Mean displacement moment of 4th order (MSD corresponds to 2nd order)</p></li>
+<li><p>Mean maximal excursion of 2nd order (MME)</p></li>
+<li><p>Mean maximal excursion of 4th order</p></li>
+</ul>
+</div></blockquote>
+<p>MME is calculated according to: Vincent Tejedor, Biophysical Journal, 98, 7, 2010 (<a class="reference external" href="https://www.cell.com/biophysj/fulltext/S0006-3495(09)06097-4">tejedor</a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>np.array</em>) – time</p></li>
+<li><p><strong>x</strong> (<em>np.array</em>) – x-position</p></li>
+<li><p><strong>y</strong> (<em>np.array</em>) – y-position</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[:,0]</span></code>: lag time</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[:,1]</span></code>: MSD</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[:,2]</span></code>: Mean displacement moment of 4th order</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[:,3]</span></code>: MME</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[:,4]</span></code>: Mean maximal excursion of 4th order</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array of size <code class="docutils literal notranslate"><span class="pre">(l_max,5)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="spt.motion_metrics.msd_ratio">
 <code class="sig-prename descclassname">spt.motion_metrics.</code><code class="sig-name descname">msd_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">moments</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.motion_metrics.msd_ratio" title="Permalink to this definition">¶</a></dt>
-<dd><p>MSD ratio (classifier H.) according to P. Kowalek, Physical Review E, 100, 2019.</p>
+<dd><p>MSD ratio (classifier H.) according to P. Kowalek, Physical Review E, 100, 2019 (<a class="reference external" href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.100.032410">kowalek</a>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>moments</strong> (<em>np.array</em>) – Return of displacement_moments(t,x,y)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>MSD ratio</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.motion_metrics.straightness">
 <code class="sig-prename descclassname">spt.motion_metrics.</code><code class="sig-name descname">straightness</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.motion_metrics.straightness" title="Permalink to this definition">¶</a></dt>
-<dd><p>Straightness (classifier I.) according to P. Kowalek, Physical Review E, 100, 2019.</p>
+<dd><p>Straightness (classifier I.) according to P. Kowalek, Physical Review E, 100, 2019 (<a class="reference external" href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.100.032410">kowalek</a>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.array</em>) – x-positions of trajectory</p></li>
+<li><p><strong>y</strong> (<em>np.array</em>) – y-positions of trajectory</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Straightness</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
