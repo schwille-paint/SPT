@@ -13,4 +13,4 @@ fastparquet==0.3.2
 sphinx-rtd-theme==0.4.3
 PyQt5
 hdbscan
-"dask[complete]"
+dask[complete]
