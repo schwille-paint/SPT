@@ -1,3 +1,11 @@
+'''
+.. _michalet:
+    https://journals.aps.org/pre/abstract/10.1103/PhysRevE.82.041914
+.. _spt:
+    https://www.biorxiv.org/content/10.1101/2020.05.17.100354v1
+.. _picasso.localize:
+    https://picassosr.readthedocs.io/en/latest/localize.html
+'''
 import os
 import numpy as np
 import pandas as pd
@@ -20,7 +28,17 @@ importlib.reload(express)
 #%%
 def fit_msd_free(lagtimes,msd,offset=False):
     '''
+    Unweighted least square fit of invidual msd by linear model ``msd=a*lagtimes+b``, see analytic_expressions.msd_free(),
+    i.e. assuming free Browninan motion. If there was less then two data-points or fit was not succesfull 
+    NaNs are returned as optimum parameters.
     
+    Args:
+        lagtimes(np.array): Array of msd lagtimes
+        msd(np.array):      Mean square displacement (msd) at lagtimes
+        offset(bool=False): If True offset is used in linear fit model, if False
+    Returns:
+        pandas.Series: Column ``a`` corresponds to slope, ``b`` corresponds to offset of linear function applied. 
+        
     '''
     x=lagtimes
     y=msd
@@ -52,7 +70,16 @@ def fit_msd_free(lagtimes,msd,offset=False):
 #%%
 def fit_msd_anomal(lagtimes,msd):
     '''
+    Unweighted least square fit of invidual msd by anomalous model ``msd=a*lagtimes**b``, 
+    see analytic_expressions.msd_anomal(). If there was less then two data-points or fit was not succesfull 
+    NaNs are returned as optimum parameters.
     
+    Args:
+        lagtimes(np.array): Array of msd lagtimes
+        msd(np.array):      Mean square displacement (msd) at lagtimes
+    Returns:
+        pandas.Series: Column ``a`` corresponds to slope, ``b`` corresponds to diffusion mode. 
+        
     '''
     x=lagtimes
     y=msd
@@ -74,9 +101,26 @@ def fit_msd_anomal(lagtimes,msd):
     return s_out
 
 #%%
-def fit_msd_free_iterative(lagtimes,msd,lp,max_it=5):
+def fit_msd_free_iterative(lagtimes,msd,max_it=5):
     '''
+    Unweighted least square fit of invidual msd by linear model ``msd=a*lagtimes+b`` in **iterative manner**
+    to find optimum fitting range of msd according to: Xavier Michalet, Physical Review E, 82, 2010 (michalet_).
+    In first iteration msd is fitted up to a maximum lagtime of ``lag_max=0.5*Nmsd`` with ``Nmsd`` being the full msd length.
+    Notice that motion_metrics.displacement_moments() calculates msd only up to ``Nmsd=0.25*N`` hence ``lag_max=0.125*N``
+    with Nbeing the full lenght of the trajectory. Then fitting range is updated according to rule 
+    ``lag_max=int(np.round(2+2.3*(b/a)**0.52))``. For a detailed illustration please see SI of spt_.
     
+    Args:
+        lagtimes(np.array): Array of msd lagtimes
+        msd(np.array):      Mean square displacement (msd) at lagtimes
+        max_it(int=5):      Maximum number of iterations
+    Returns:
+        pandas.Series:
+            
+            - ``a`` slope  of linear function applied.
+            - ``b`` offset of linear function applied
+            - ``p`` maximum lagtime up to which msd was fitted
+            - ``max_it`` resulting number of iterations until convergence was achieved
     '''
     ### Set inital track length that will be fitted to half the msd, 
     ### which is already set to only 0.25 of full track length, hence only 12.5% are used!
@@ -92,8 +136,8 @@ def fit_msd_free_iterative(lagtimes,msd,lp,max_it=5):
         s_out=fit_msd_free(t,y,offset=True)
         
         ### Update x 
-        x=np.abs((4*lp)/s_out['a'])
-        # x=np.abs(s_out['b']/(s_out['a']))
+        # x=np.abs((4*lp)/s_out['a'])
+        x=np.abs(s_out['b']/(s_out['a']))
         
         ### Assign iteration and fitted track length
         s_out['p']=p[-1]
@@ -118,7 +162,21 @@ def fit_msd_free_iterative(lagtimes,msd,lp,max_it=5):
 #%%
 def getfit_moments(df):
     '''
-    Calculate msd of single trjecory using metrics.mean_displacement_moments() and apply all fit methods.
+    Calculate msd of single trajectory using metrics.displacement_moments() and apply both linear iterative fitting
+    according to fit_msd_free_iterative() and anomalous diffsuion model fitting using fit_msd_anomal() to msd.
+    
+    Args:
+        df(pandas.DataFrame): Trajectories (_pickedxxxx.hdf5) as obtained by linklocs.main()
+    Returns:
+        pandas.Series: 
+            Concatenated output of fit_msd_free_iterative() and fit_msd_anomal().
+            
+            - ``a_iter`` slope  of iterative linear fit
+            - ``b_iter`` offset of iterative linear fit
+            - ``p_iter`` maximum lagtime up to which msd was fitted for iterative linear fit
+            - ``max_iter`` resulting number of iterations until convergence was achieved for iterative linear fit
+            - ``a`` slope of anomalous fit 
+            - ``b`` diffusion mode of anomalous fit
     '''
 
     ### Get displacement moments
@@ -126,43 +184,20 @@ def getfit_moments(df):
                                          df.x.values,
                                          df.y.values) 
     
-    
-    ### Get some metrics
-    meanmoment_ratio=np.median(moments[:,2]/(moments[:,1]**2))
-    maxmoment_ratio=np.median(moments[:,4]/(moments[:,3]**2))
-    msd_ratio=metrics.msd_ratio(moments)
-    straight=metrics.straightness(df.x.values,
-                                  df.y.values)
-    
-    s_other=pd.Series({'meanmoment_ratio':meanmoment_ratio,
-                       'maxmoment_ratio':maxmoment_ratio,
-                       'msd_ratio':msd_ratio,
-                       'straight':straight,
-                       })
-    
     ########################## MSD fitting
     x=moments[:,0] # Define lagtimes, x values for fit
     y=moments[:,1] # Define MSD, y values for fit
     
     ### Anomalous diffusion (0.25 length)
-    s_anom_msd=fit_msd_anomal(x,y).rename({'a':'a_anom','b':'b_anom'})
+    s_anom=fit_msd_anomal(x,y).rename({'a':'a_anom','b':'b_anom'})
     
     ### Iterative fit
-    lp=np.mean(df.lpx**2+df.lpy**2) # Get localization precision as input for iterative fit
-    s_iter=fit_msd_free_iterative(x,y,lp).rename({'a':'a_iter','b':'b_iter','p':'p_iter','max_it':'max_iter'})
+    s_iter=fit_msd_free_iterative(x,y).rename({'a':'a_iter','b':'b_iter','p':'p_iter','max_it':'max_iter'})
     
-    ########################## MME fitting
-    x=moments[:,0] # Define lagtimes, x values for fit
-    y=moments[:,3] # Define MME, y values for fit
-    
-    ## Anomalous diffusion (0.25 length)
-    s_anom_mme=fit_msd_anomal(x,y).rename({'a':'a_mme_anom','b':'b_mme_anom'})
-    
+
     ### Asign output series
-    s_out=pd.concat([s_other,
-                     s_anom_msd,
+    s_out=pd.concat([s_anom,
                      s_iter,
-                     s_anom_mme,
                      ])
     
     return s_out
@@ -170,17 +205,12 @@ def getfit_moments(df):
 #%%
 def get_props(df):
     """ 
-    Wrapper function to combine:
+    Combination of immobile_props.get_var(df) and getfit_moments(df).
     
-    Parameters
-    ---------
-    df : pandas.DataFrame
-        'locs' of locs_picked.hdf5 as given by Picasso
-
-    Returns
-    -------
-    s : pandas.DataFrame
-        Columns as defined in individual functions. Index corresponds to 'group'.
+    Args:
+        df(pandas.DataFrame): Trajectories (_pickedxxxx.hdf5) as obtained by linklocs.main()
+    Returns:
+        pandas.Series:       Concatenated output of immobile_props.get_var(df) and getfit_moments(df).
     """
     
     # Call individual functions
@@ -196,7 +226,13 @@ def get_props(df):
 #%%
 def apply_props(df):
     """ 
-          
+    Group trajectories list (_pickedxxxx.hdf5) as obtained by linklocs.main() by groups (i.e. trajectories) and 
+    apply get_props() to each group to get mobile properties. See also `spt`_.
+    
+    Args:
+        df(pandas.DataFrame): Trajectories list (_pickedxxxx.hdf5) as obtained by linklocs.main()
+    Returns:
+        pandas.DataFrame:     Output of get_props() for each group in ``df`` (groupby-apply approach).     
     """
     tqdm.pandas() # For progressbar under apply
     df_props = df.groupby('group').progress_apply(get_props)
@@ -206,8 +242,13 @@ def apply_props(df):
 #%%
 def apply_props_dask(df): 
     """
-    Applies pick_props.get_props(df,NoFrames,ignore) to each group in parallelized manner using dask by splitting df into 
-    various partitions.
+    Same as apply_props() but in parallelized version using DASK by partitioning df. 
+    Local DASK cluster has to be started manually for efficient computation, see cluster_setup_howto().
+    
+    Args:
+        df(pandas.DataFrame): Trajectories list (_pickedxxxx.hdf5) as obtained by linklocs.main()
+    Returns:
+        pandas.DataFrame:     Output of get_props() for each group in ``df`` (groupby-apply approach).
     """
     
     ### Define groupby.apply function for dask which will be applied to different partitions of df
@@ -228,22 +269,22 @@ def apply_props_dask(df):
 #%%
 def main(locs,info,path,**params):
     '''
-    Cluster detection (pick) in localization list by thresholding in number of localizations per cluster.
-    Cluster centers are determined by creating images of localization list with set oversampling.
+    Get mobile properties for each group in trajectories list (_pickedxxxx.hdf5) file as obtained by linklocs.main().
     
     
-    args:
-        locs(pd.Dataframe):        Picked localizations as created by picasso render
-        info(list(dict)):          Info to picked localizations
-        path(str):                 Path to _picked.hdf5 file.
+    Args:
+        locs(pandas.DataFrame):    Trajectories list (_pickedxxxx.hdf5) as obtained by linklocs.main()
+        info(list):                Info _pickedxxxx.yaml to _pickedxxxx.hdf5 trajectories as list of dictionaries.
+        path(str):                 Path to _pickedxxxx.hdf5 file.
         
-    **kwargs: If not explicitly specified set to default, also when specified as None
-        parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)
+    Keyword Args:
+        parallel(bool=True):       Apply parallel computing using DASK? Local cluster should be started before according to cluster_setup_howto()
     
-    return:
-        list[0](dict):             Dict of **kwargs passed to function.
-        list[1](pandas.DataFrame): Kinetic properties of all groups.
-                                   Will be saved with extension '_picked_tprops.hdf5' for usage in picasso.filter
+    Returns:
+        list:
+            
+        - [0](dict):             Dict of keyword arguments passed to function.
+        - [1](pandas.DataFrame): Mobile properties of each group in ``locs`` as calulated by apply_props()
     '''
     ##################################### Params and file handling
     

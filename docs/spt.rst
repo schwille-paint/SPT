@@ -15,7 +15,7 @@ Some analytic expressions used in other submodules, e.g. fitting functions, cdf,
 
 spt.analyze
 -----------
-Further evaluate (averaging, ...) *_tprops. or *_tmobprops.hdf5 files, i.e. to generate end result of kinetic analysis.
+Further evaluate (averaging, ...) _tprops. or _tmobprops.hdf5 files, i.e. to generate end result of kinetic analysis.
 
 .. automodule:: spt.analyze
    :members:
@@ -60,7 +60,7 @@ Numba optimized caluclation of motion metrics like MSD, MME, straightness, msd_r
 
 spt.special
 -----------
-Some speial functions, e.g. track splitting, generation of track and diffusion maps, ...
+Some special functions, e.g. track splitting into subtrajectories, generation of track and diffusion maps, ...
 
 .. automodule:: spt.special
    :members:

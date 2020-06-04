@@ -254,7 +254,7 @@ According to: Xavier Michalet, Physical Review E, 82, 2010 (<a class="reference 
 </div>
 <div class="section" id="spt-analyze">
 <h2>spt.analyze<a class="headerlink" href="#spt-analyze" title="Permalink to this headline">¶</a></h2>
-<p>Further evaluate (averaging, …) <a href="#id1"><span class="problematic" id="id2">*</span></a>_tprops. or <a href="#id3"><span class="problematic" id="id4">*</span></a>_tmobprops.hdf5 files, i.e. to generate end result of kinetic analysis.</p>
+<p>Further evaluate (averaging, …) _tprops. or _tmobprops.hdf5 files, i.e. to generate end result of kinetic analysis.</p>
 <span class="target" id="module-spt.analyze"></span><dl class="py function">
 <dt id="spt.analyze.fit_Ncomb">
 <code class="sig-prename descclassname">spt.analyze.</code><code class="sig-name descname">fit_Ncomb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">centers_init</span></em>, <em class="sig-param"><span class="n">N</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.analyze.fit_Ncomb" title="Permalink to this definition">¶</a></dt>
@@ -830,40 +830,14 @@ corresponding to first 100 frames (full FOV) are greater than proximity (px).</p
 <span class="target" id="module-spt.mob_props"></span><dl class="py function">
 <dt id="spt.mob_props.apply_props">
 <code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">apply_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.apply_props" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="spt.mob_props.apply_props_dask">
-<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">apply_props_dask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.apply_props_dask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Applies pick_props.get_props(df,NoFrames,ignore) to each group in parallelized manner using dask by splitting df into
-various partitions.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="spt.mob_props.fit_msd_anomal">
-<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">fit_msd_anomal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lagtimes</span></em>, <em class="sig-param"><span class="n">msd</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.fit_msd_anomal" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="spt.mob_props.fit_msd_free">
-<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">fit_msd_free</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lagtimes</span></em>, <em class="sig-param"><span class="n">msd</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.fit_msd_free" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="spt.mob_props.fit_msd_free_iterative">
-<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">fit_msd_free_iterative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lagtimes</span></em>, <em class="sig-param"><span class="n">msd</span></em>, <em class="sig-param"><span class="n">lp</span></em>, <em class="sig-param"><span class="n">max_it</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.fit_msd_free_iterative" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="spt.mob_props.get_props">
-<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">get_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.get_props" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wrapper function to combine:</p>
+<dd><p>Group trajectories list (_pickedxxxx.hdf5) as obtained by linklocs.main() by groups (i.e. trajectories) and
+apply get_props() to each group to get mobile properties. See also <a class="reference external" href="https://www.biorxiv.org/content/10.1101/2020.05.17.100354v1">spt</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – ‘locs’ of locs_picked.hdf5 as given by Picasso</p>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Trajectories list (_pickedxxxx.hdf5) as obtained by linklocs.main()</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>s</strong> – Columns as defined in individual functions. Index corresponds to ‘group’.</p>
+<dd class="field-even"><p>Output of get_props() for each group in <code class="docutils literal notranslate"><span class="pre">df</span></code> (groupby-apply approach).</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pandas.DataFrame</p>
@@ -872,40 +846,168 @@ various partitions.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="spt.mob_props.apply_props_dask">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">apply_props_dask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.apply_props_dask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as apply_props() but in parallelized version using DASK by partitioning df.
+Local DASK cluster has to be started manually for efficient computation, see cluster_setup_howto().</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Trajectories list (_pickedxxxx.hdf5) as obtained by linklocs.main()</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output of get_props() for each group in <code class="docutils literal notranslate"><span class="pre">df</span></code> (groupby-apply approach).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.mob_props.fit_msd_anomal">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">fit_msd_anomal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lagtimes</span></em>, <em class="sig-param"><span class="n">msd</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.fit_msd_anomal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unweighted least square fit of invidual msd by anomalous model <code class="docutils literal notranslate"><span class="pre">msd=a*lagtimes**b</span></code>,
+see analytic_expressions.msd_anomal(). If there was less then two data-points or fit was not succesfull
+NaNs are returned as optimum parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lagtimes</strong> (<em>np.array</em>) – Array of msd lagtimes</p></li>
+<li><p><strong>msd</strong> (<em>np.array</em>) – Mean square displacement (msd) at lagtimes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Column <code class="docutils literal notranslate"><span class="pre">a</span></code> corresponds to slope, <code class="docutils literal notranslate"><span class="pre">b</span></code> corresponds to diffusion mode.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.mob_props.fit_msd_free">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">fit_msd_free</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lagtimes</span></em>, <em class="sig-param"><span class="n">msd</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.fit_msd_free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unweighted least square fit of invidual msd by linear model <code class="docutils literal notranslate"><span class="pre">msd=a*lagtimes+b</span></code>, see analytic_expressions.msd_free(),
+i.e. assuming free Browninan motion. If there was less then two data-points or fit was not succesfull
+NaNs are returned as optimum parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lagtimes</strong> (<em>np.array</em>) – Array of msd lagtimes</p></li>
+<li><p><strong>msd</strong> (<em>np.array</em>) – Mean square displacement (msd) at lagtimes</p></li>
+<li><p><strong>offset</strong> (<em>bool=False</em>) – If True offset is used in linear fit model, if False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Column <code class="docutils literal notranslate"><span class="pre">a</span></code> corresponds to slope, <code class="docutils literal notranslate"><span class="pre">b</span></code> corresponds to offset of linear function applied.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.mob_props.fit_msd_free_iterative">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">fit_msd_free_iterative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lagtimes</span></em>, <em class="sig-param"><span class="n">msd</span></em>, <em class="sig-param"><span class="n">max_it</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.fit_msd_free_iterative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unweighted least square fit of invidual msd by linear model <code class="docutils literal notranslate"><span class="pre">msd=a*lagtimes+b</span></code> in <strong>iterative manner</strong>
+to find optimum fitting range of msd according to: Xavier Michalet, Physical Review E, 82, 2010 (<a class="reference external" href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.82.041914">michalet</a>).
+In first iteration msd is fitted up to a maximum lagtime of <code class="docutils literal notranslate"><span class="pre">lag_max=0.5*Nmsd</span></code> with <code class="docutils literal notranslate"><span class="pre">Nmsd</span></code> being the full msd length.
+Notice that motion_metrics.displacement_moments() calculates msd only up to <code class="docutils literal notranslate"><span class="pre">Nmsd=0.25*N</span></code> hence <code class="docutils literal notranslate"><span class="pre">lag_max=0.125*N</span></code>
+with Nbeing the full lenght of the trajectory. Then fitting range is updated according to rule
+<code class="docutils literal notranslate"><span class="pre">lag_max=int(np.round(2+2.3*(b/a)**0.52))</span></code>. For a detailed illustration please see SI of <a class="reference external" href="https://www.biorxiv.org/content/10.1101/2020.05.17.100354v1">spt</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lagtimes</strong> (<em>np.array</em>) – Array of msd lagtimes</p></li>
+<li><p><strong>msd</strong> (<em>np.array</em>) – Mean square displacement (msd) at lagtimes</p></li>
+<li><p><strong>max_it</strong> (<em>int=5</em>) – Maximum number of iterations</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">a</span></code> slope  of linear function applied.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">b</span></code> offset of linear function applied</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p</span></code> maximum lagtime up to which msd was fitted</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_it</span></code> resulting number of iterations until convergence was achieved</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spt.mob_props.get_props">
+<code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">get_props</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.get_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combination of immobile_props.get_var(df) and getfit_moments(df).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Trajectories (_pickedxxxx.hdf5) as obtained by linklocs.main()</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Concatenated output of immobile_props.get_var(df) and getfit_moments(df).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="spt.mob_props.getfit_moments">
 <code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">getfit_moments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.getfit_moments" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate msd of single trjecory using metrics.mean_displacement_moments() and apply all fit methods.</p>
+<dd><p>Calculate msd of single trajectory using metrics.displacement_moments() and apply both linear iterative fitting
+according to fit_msd_free_iterative() and anomlaous diffsuion model fitting using fit_msd_anomal() to msd.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Trajectories (_pickedxxxx.hdf5) as obtained by linklocs.main()</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Concatenated output of fit_msd_free_iterative() and fit_msd_anomal().</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">a_iter</span></code> slope  of iterative linear fit</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">b_iter</span></code> offset of iterative linear fit</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p_iter</span></code> maximum lagtime up to which msd was fitted for iterative linear fit</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_iter</span></code> resulting number of iterations until convergence was achieved for iterative linear fit</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">a</span></code> slope of anomalous fit</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">b</span></code> diffusion mode of anomalous fit</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="spt.mob_props.main">
 <code class="sig-prename descclassname">spt.mob_props.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">locs</span></em>, <em class="sig-param"><span class="n">info</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.mob_props.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cluster detection (pick) in localization list by thresholding in number of localizations per cluster.
-Cluster centers are determined by creating images of localization list with set oversampling.</p>
+<dd><p>Get mobile properties for each group in trajectories list (_pickedxxxx.hdf5) file as obtained by linklocs.main().</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>locs</strong> (<em>pd.Dataframe</em>) – Picked localizations as created by picasso render</p></li>
-<li><p><strong>info</strong> (<em>list</em><em>(</em><em>dict</em><em>)</em>) – Info to picked localizations</p></li>
-<li><p><strong>path</strong> (<em>str</em>) – Path to _picked.hdf5 file.</p></li>
+<li><p><strong>locs</strong> (<em>pandas.DataFrame</em>) – Trajectories list (_pickedxxxx.hdf5) as obtained by linklocs.main()</p></li>
+<li><p><strong>info</strong> (<em>list</em>) – Info _pickedxxxx.yaml to _pickedxxxx.hdf5 trajectories as list of dictionaries.</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – Path to _pickedxxxx.hdf5 file.</p></li>
 </ul>
 </dd>
-</dl>
-<dl class="simple">
-<dt><a href="#id6"><span class="problematic" id="id7">**</span></a>kwargs: If not explicitly specified set to default, also when specified as None</dt><dd><p>parallel(bool=True):       Apply parallel computing? (better speed, but a few lost groups)</p>
+<dt class="field-even">Keyword Arguments</dt>
+<dd class="field-even"><p><strong>parallel</strong> (<em>bool=True</em>) – Apply parallel computing using DASK? Local cluster should be started before according to cluster_setup_howto()</p>
 </dd>
-</dl>
-<dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><p>Dict of <a href="#id8"><span class="problematic" id="id9">**</span></a>kwargs passed to function.
-list[1](pandas.DataFrame): Kinetic properties of all groups.</p>
-<blockquote>
-<div><p>Will be saved with extension ‘_picked_tprops.hdf5’ for usage in picasso.filter</p>
-</div></blockquote>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>[0](dict):             Dict of keyword arguments passed to function.</p></li>
+<li><p>[1](pandas.DataFrame): Mobile properties of each group in <code class="docutils literal notranslate"><span class="pre">locs</span></code> as calulated by apply_props()</p></li>
+</ul>
 </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list[0](dict)</p>
+<dd class="field-even"><p>list</p>
 </dd>
 </dl>
 </dd></dl>
@@ -993,7 +1095,7 @@ Calulated moments are:</p>
 </div>
 <div class="section" id="spt-special">
 <h2>spt.special<a class="headerlink" href="#spt-special" title="Permalink to this headline">¶</a></h2>
-<p>Some speial functions, e.g. track splitting, generation of track and diffusion maps, …</p>
+<p>Some special functions, e.g. track splitting into subtrajectories, generation of track and diffusion maps, …</p>
 <span class="target" id="module-spt.special"></span><dl class="py function">
 <dt id="spt.special.assign_prop_to_picked">
 <code class="sig-prename descclassname">spt.special.</code><code class="sig-name descname">assign_prop_to_picked</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">props</span></em>, <em class="sig-param"><span class="n">picked</span></em>, <em class="sig-param"><span class="n">field</span><span class="o">=</span><span class="default_value">'a_iter'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spt.special.assign_prop_to_picked" title="Permalink to this definition">¶</a></dt>
