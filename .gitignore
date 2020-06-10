@@ -7,7 +7,6 @@ __pycache__/
 .gitignore~
 .gitignore
 /.ipynb_checkpoints
-/scripts
 /spt/dask-worker-space
 /dask-worker-space
 /scripts/dask-worker-space
