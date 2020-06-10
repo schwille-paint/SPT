@@ -16,17 +16,17 @@ importlib.reload(improps)
 
 ############################################# Load raw data
 dir_names=[]
-dir_names.extend([r'C:\Data\p06.SP-tracking\20-03-11_pseries_fix_B21_rep\id140_B_exp200_p114uW_T21_1\test'])
+dir_names.extend([r'C:\Users\flori\Downloads\picasso_tutorial\picasso_tutorial'])
 
 file_names=[]
-file_names.extend(['id140_B_exp200_p114uW_T21_1_MMStack_Pos0.ome.tif'])
+file_names.extend(['All_concatenated_cent256.tif'])
 
 
 ############################################ Set non standard parameters 
 ### Valid for all evaluations
-params_all={'undrift':False,
-            'min_n_locs':5,
-            'filter':'fix',
+params_all={'undrift':True,
+            'lbfcs':True,
+            'filter':'none',
             }
 
 ### Exceptions
@@ -58,7 +58,7 @@ for i in range(0,len(file_names)):
         
         ### Localize and undrift
         out=localize.main(movie,info,path,**params)
-        info=info+[out[0]] # Update info to used params
+        info=info+[out[0][0]]+[out[0][1]] # Update info to used params 
         path=out[-1] # Update path
         
         ### Autopick
