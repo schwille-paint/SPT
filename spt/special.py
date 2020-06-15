@@ -3,6 +3,40 @@ import numpy as np
 from tqdm import tqdm
 import numba 
 
+#%%
+def double_jumptime(df,segment,ratio):
+    
+    N=len(df)
+    k=int(N/(segment*ratio))+1 # Number of full cycles
+    
+    t=df.frame.values
+    dt=np.concatenate([np.array([0]),t[1:]-t[:-1]])
+    
+    mask_unit=np.array([1]*(segment*(ratio-1))+[2]*segment)
+    mask=np.concatenate([mask_unit]*k)
+    mask=mask[:N]
+    
+    dt_mod=dt*mask
+    t_mod=np.cumsum(dt_mod)+t[0]
+    
+    df.frame=t_mod.astype(int)
+    
+    return df
+
+#%%
+def apply_double_jumptime(df,segment,ratio):
+    
+    print('Doubling jumptimes ...')
+    print('... every %i. segment ...'%ratio)
+    print('... of %i localizations each.'%segment)
+    df_mod=df.copy()
+    
+    tqdm.pandas()
+    df_mod=df_mod.groupby('group').progress_apply(lambda df: double_jumptime(df,segment,ratio))
+        
+    df_mod.reset_index(inplace=True)
+    
+    return df_mod
 
 #%%
 def assign_subgroup(df,subN):
@@ -16,7 +50,7 @@ def assign_subgroup(df,subN):
         
     return:
         subdf(pandas.DataFrame): Picked localizations (see picasso.render) with one new (subgroup)
-                                 and one modified column (supgroup = group of original). See also above.              :
+                                 and one modified column (supgroup = group of original). See also above.
 
     '''
     
@@ -78,8 +112,8 @@ def split_trajectories(df,subN):
     supdf=df.rename(columns={'group':'supgroup'})
     
     ### Convert groups in supgroups and assign subgroups of len subN to df
-    # with tqdm.pandas(): # For progressbar under apply
-    subdf=supdf.groupby('supgroup').apply(lambda df: assign_subgroup(df,subN))
+    tqdm.pandas() # For progressbar under apply
+    subdf=supdf.groupby('supgroup').progress_apply(lambda df: assign_subgroup(df,subN))
     subdf.reset_index(inplace=True)
     subdf.drop(columns=['level_1'],inplace=True)
     

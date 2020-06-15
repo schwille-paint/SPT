@@ -73,8 +73,11 @@ def displacement_moments(t,x,y):
         moments[l,3]=np.nanmean(r2max_leql)
         moments[l,4]=np.nanmean(r4max_leql)
 
-    
+    ### Remove first entry
     moments=moments[1:,:]
+    ### Remove NaNs due to gaps in trace
+    moments=moments[np.isfinite(moments[:,1])]
+    
     return moments
 
 #%%

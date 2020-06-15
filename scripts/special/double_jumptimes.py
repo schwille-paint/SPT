@@ -16,11 +16,12 @@ dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_th_slb_L_T21\slb_id169_R1-5
 
 file_names=[]
 # file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p038uW_T21_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
-file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs_picked0503_double-50-each-2.hdf5'])
+file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
 # file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p250uW_T21_1_MMStack_Pos0.ome_locs_picked0503.hdf5'])
 
 ############################################ Set maximum length of sub-trajectories
-subN=50
+segment=50 # Number of localizations within segments
+ratio=2 # ratio=2(3) means every second(third) segment jumptimes are doubled, i.e. apparent slower diffusion
 
 #%%
 ############################################ Main loop                   
@@ -35,14 +36,14 @@ for i in range(0,len(file_names)):
         locs,info=addon_io.load_locs(path) 
         
         ### Split
-        locs_split=special.split_trajectories(locs,subN) 
+        locs_double=special.apply_double_jumptime(locs,segment,ratio) 
         
         ### Save
         path=os.path.splitext(path)[0]
-        info_split=info.copy()+[{'subN':subN}]
-        addon_io.save_locs(path+'_split%i.hdf5'%subN,
-                           locs_split,
-                           info_split,
+        info_double=info.copy()+[{'segment':segment,'ratio':ratio}]
+        addon_io.save_locs(path+'_double-%i-each-%i.hdf5'%(segment,ratio),
+                           locs_double,
+                           info_double,
                            mode='picasso_compatible')
         
     except Exception:
