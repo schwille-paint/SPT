@@ -4,15 +4,27 @@ from tqdm import tqdm
 import numba 
 
 #%%
-def double_jumptime(df,segment,ratio):
+def multiply_jumptimes(df,factor,segment,ratio):
+    '''
+    Multiply jumptimes by ``factor`` in segments. Segments number of localizations is given by ``segment``. 
+    Ratio indicates how many segments are mutiplied, i.e. for ``ratio=2`` every 2nd, for ``ratio=3`` every third segment is multiplied
+    leading to apparent slower diffusion within these segments.
     
+    Args:
+        df(pandas.DataFrame): One trajectory as returned by spt.mob_props.main() (i.e. one group in pickedXXXX.hdf5 files) 
+        factor(int):          Jumptime multiplication factor
+        segment(int):         Number of localizations within segments.
+        ratio(int):           Ratio of slowed down to normal segments (see above).
+    Return:
+        pandas.DataFrame: Same as ``df`` but with modified jumptimes.
+    '''
     N=len(df)
     k=int(N/(segment*ratio))+1 # Number of full cycles
     
     t=df.frame.values
     dt=np.concatenate([np.array([0]),t[1:]-t[:-1]])
     
-    mask_unit=np.array([1]*(segment*(ratio-1))+[2]*segment)
+    mask_unit=np.array([1]*(segment*(ratio-1))+[factor]*segment)
     mask=np.concatenate([mask_unit]*k)
     mask=mask[:N]
     
@@ -24,15 +36,28 @@ def double_jumptime(df,segment,ratio):
     return df
 
 #%%
-def apply_double_jumptime(df,segment,ratio):
-    
-    print('Doubling jumptimes ...')
+def apply_multiply_jumptimes(df,factor,segment,ratio):
+    '''
+    Groupby apply approach of multiply_jumptimes(df,factor,segment,ratio) to each group in ``df``.
+
+    Args:
+        df(pandas.DataFrame): (Complete) linked localizations as returned by spt.mob_props.main() (pickedXXXX.hdf5 files) 
+        factor(int):          Jumptime multiplication factor
+        segment(int):         Number of localizations within segments.
+        ratio(int):           Ratio of slowed down to normal segments (see above).
+
+    Return:
+        df_mod (TYPE): Same as ``df`` but with modified jumptimes.
+
+    '''
+    print('Multiplying jumptimes ...')
+    print('... by facor of %ix ...'%factor)
     print('... every %i. segment ...'%ratio)
     print('... of %i localizations each.'%segment)
     df_mod=df.copy()
     
     tqdm.pandas()
-    df_mod=df_mod.groupby('group').progress_apply(lambda df: double_jumptime(df,segment,ratio))
+    df_mod=df_mod.groupby('group').progress_apply(lambda df: multiply_jumptimes(df,factor,segment,ratio))
         
     df_mod.reset_index(inplace=True)
     
@@ -41,17 +66,16 @@ def apply_double_jumptime(df,segment,ratio):
 #%%
 def assign_subgroup(df,subN):
     '''
-    Renames group colum into supgroup and and assigns new column subgroup.
-    Each subgroup splits the supgroup in chunks of subN, i.e. splitting of trajectories.
+    Splitting of ``supgroup`` (full trajectory ID) into ``subgroup`` (subtrajectory ID).
+    Each subgroup splits the supgroup in chunks of ``subN``, i.e. the subtrajectory duration.
+    Subtrajectories with less then 10 localizations are dropped.
     
-    args:
-        df(pandas.DataFrame):    Picked localizations (see picasso.render)
+    Args:
+        df(pandas.DataFrame):    One trajectory as returned by spt.mob_props.main() (i.e. one group in pickedXXXX.hdf5 files) 
         subN(int):               Maximum length of sub-trajectories
         
-    return:
-        subdf(pandas.DataFrame): Picked localizations (see picasso.render) with one new (subgroup)
-                                 and one modified column (supgroup = group of original). See also above.
-
+    Return:
+        pandas.DataFrame: Same as ``df`` but with one new column ``subgroup`` (subtrajectory ID) in chunks of ``subN``. See also above.
     '''
     
     df=df.drop(columns=['supgroup']) # Drop supgroup, since it will appear in index through groupby!
@@ -80,32 +104,20 @@ def assign_subgroup(df,subN):
     return df_out
 
 #%%
-def pair_ids(x,y):
-    ''' 
-    Function to map two integers to one in a unique and deterministic manner.
-    Python implementation of Matthew Szudzik's elegant pairing function (WolframAlpha)
-    '''
-    if x!=max(x,y):
-        z=y**2+x
-    elif x==max(x,y):
-        z=x**2+x+y
-    
-    return int(z)
-
-#%%
 def split_trajectories(df,subN):
     '''
-    Split trajectories into shorter trajectories of length subN. Three new columns are assigned to give track ID:
-        supgroup: Super-group = group column of original
-        subgroup: Sub-group = New trajectories of length subN or lower
-        group:    Unique new sub-group ID
+    Groupby apply approach of assign_subgroup(df,subN) to each group in ``df``.
+    Splits trajectories into shorter trajectories of length ``subN``. Three new columns are assigned to give track ID:
+        ``supgroup``: Super-group = group column of original
+        ``subgroup``: Sub-group = New trajectories of length subN or lower
+        ``group``:    Unique new sub-group ID
     
-    args:
-        df(pandas.DataFrame):    Picked localizations (see picasso.render)
+    Args:
+        df(pandas.DataFrame):    (Complete) linked localizations as returned by spt.mob_props.main() (pickedXXXX.hdf5 files)
         subN(int):               Maximum length of sub-trajectories
         
-    return:
-        subdf(pandas.DataFrame): Picked localizations (see picasso.render) with three new or modified columns (see above)              
+    Return:
+        pandas.DataFrame: Same as ``df`` but with new columns indicating sup(er)- or subtrajectories. See above.               
     '''
     print('Start splitting ...')
     #### Rename group to supgroup (super-group)
@@ -117,9 +129,12 @@ def split_trajectories(df,subN):
     subdf.reset_index(inplace=True)
     subdf.drop(columns=['level_1'],inplace=True)
     
+    print('Assign unique group index ...')
     ### Transform supgroup and subgroup into unique groupID
-    ### using Matthew Szudzik's elegant pairing function (WolframAlpha)
-    groups=subdf.apply(lambda df: pair_ids(df['supgroup'],df['subgroup']),axis=1)
+    i=subdf.loc[:,['supgroup','subgroup']].values
+    value,count=np.unique(i,axis=0,return_counts=True)
+    groups=[[np.ones(count[j])*j] for j in range(len(count))]
+    groups=np.concatenate(groups,axis=1).flatten().astype(np.int64)
     subdf=subdf.assign(group=groups)
     
     return subdf
