@@ -4,6 +4,50 @@ from tqdm import tqdm
 import numba 
 
 #%%
+def multiply_jumps(df,factor,segment,ratio):
+    '''
+    Multiply jumps by ``sqrt(factor)`` such that segments will have a diffusion contant multiplied by ``factor``. 
+    Segments number of localizations is given by ``segment``. 
+    Ratio indicates how many segments are mutiplied, i.e. for ``ratio=2`` every 2nd, 
+    for ``ratio=3`` every third segment is multiplied.
+    
+    Args:
+        df(pandas.DataFrame): One trajectory as returned by spt.mob_props.main() (i.e. one group in pickedXXXX.hdf5 files) 
+        factor(int):          Diffusion constant multiplication factor, i.e. jumps will mutliplied by sqrt(factor) !!
+        segment(int):         Number of localizations within segments.
+        ratio(int):           Ratio of multiplied to normal segments (see above).
+    Return:
+        pandas.DataFrame: Same as ``df`` but with modified jumptimes.
+    '''
+    N=len(df)
+    k=int(N/(segment*ratio))+1 # Number of full cycles
+    
+    ### Jumps in x-y for every position
+    x=df.x.values
+    dx=np.concatenate([np.array([0]),x[1:]-x[:-1]])
+    y=df.y.values
+    dy=np.concatenate([np.array([0]),y[1:]-y[:-1]])
+    
+    ### Create mask for segment multiplication
+    ### 
+    mask_unit=np.array([1]*(segment*(ratio-1))+[np.sqrt(factor)]*segment)
+    mask=np.concatenate([mask_unit]*k)
+    mask=mask[:N]
+    
+    ### Apply mask and sum up consecutive jumps starting from first position
+    ### to get new x-y coordinates
+    dx_mod=dx*mask
+    x_mod=np.cumsum(dx_mod)+x[0]
+    dy_mod=dy*mask
+    y_mod=np.cumsum(dy_mod)+x[0]
+    
+    ### Assign new positions
+    df.x=x_mod
+    df.y=y_mod
+    
+    return df
+
+#%%
 def multiply_jumptimes(df,factor,segment,ratio):
     '''
     Multiply jumptimes by ``factor`` in segments. Segments number of localizations is given by ``segment``. 
@@ -36,7 +80,7 @@ def multiply_jumptimes(df,factor,segment,ratio):
     return df
 
 #%%
-def apply_multiply_jumptimes(df,factor,segment,ratio):
+def apply_multiply_jumps(df,factor,segment,ratio):
     '''
     Groupby apply approach of multiply_jumptimes(df,factor,segment,ratio) to each group in ``df``.
 
@@ -50,14 +94,15 @@ def apply_multiply_jumptimes(df,factor,segment,ratio):
         df_mod (TYPE): Same as ``df`` but with modified jumptimes.
 
     '''
-    print('Multiplying jumptimes ...')
-    print('... by facor of %ix ...'%factor)
+    ### Print some statements
+    print('Multiplying jumps ...')
+    print('... by factor of %i'%(factor*100) +r'% ...')
     print('... every %i. segment ...'%ratio)
     print('... of %i localizations each.'%segment)
     df_mod=df.copy()
     
     tqdm.pandas()
-    df_mod=df_mod.groupby('group').progress_apply(lambda df: multiply_jumptimes(df,factor,segment,ratio))
+    df_mod=df_mod.groupby('group').progress_apply(lambda df: multiply_jumps(df,factor,segment,ratio))
         
     df_mod.reset_index(inplace=True)
     

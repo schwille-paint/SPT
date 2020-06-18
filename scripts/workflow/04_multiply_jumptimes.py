@@ -21,7 +21,7 @@ file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos
 
 ############################################ Define how jumptimes are modified
 # By which factor are jumptimes multiplied?
-factor=4 
+factor=1/4 
 # Number of localizations within segments
 segment=50
 # ratio=2(3) means every second(third) segment jumptimes are multiplied, i.e. apparent slower diffusion
@@ -40,12 +40,14 @@ for i in range(0,len(file_names)):
         locs,info=addon_io.load_locs(path) 
         
         ### Split
-        locs_double=special.apply_multiply_jumptimes(locs,factor,segment,ratio) 
+        locs_double=special.apply_multiply_jumps(locs,factor,segment,ratio) 
         
         ### Save
+        f='%i'%(factor*100) # Convert to percentage value
+        f=f.zfill(3) # Convert 3 digit leading zeros string 
         path=os.path.splitext(path)[0]
         info_double=info.copy()+[{'segment':segment,'ratio':ratio}]
-        addon_io.save_locs(path+'_f%is%ir%i.hdf5'%(factor,segment,ratio),
+        addon_io.save_locs(path+'_f%ss%ir%i.hdf5'%(f,segment,ratio),
                            locs_double,
                            info_double,
                            mode='picasso_compatible')
