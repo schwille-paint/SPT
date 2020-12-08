@@ -11,20 +11,20 @@ import picasso_addon.io as io
 import spt.analyze as analyze
 import spt.analytic_expressions as anexpress
 importlib.reload(analyze)
-# plt.style.use('~/lbFCS/styles/paper.mplstyle')
+plt.style.use('~/lbFCS/styles/paper.mplstyle')
 
 ############################################################## Parameters
-save_results=True
+save_results=False
 
-savedir='/fs/pool/pool-schwille-paint/Analysis/p06.SP-tracking/immobile/tracking-handle/z.datalog'
-savename=os.path.splitext(os.path.basename(sys.argv[0]))[0]
+savedir='~'
+savename='dye_sample_buffer_exp200_p114uW'
 
 ############################################################## Define data
 dir_names=[]
-dir_names.extend([r'C:\Users\flori\Documents\data\SPT\mobile\th\L21_exp200_p038uW'])
+dir_names.extend([r'/fs/pool/pool-schwille-paint/Data/p06.SP-tracking/20-03-05_pseries_th_B21/id169_B_exp200_p114uW_T21_1/20-03-05_JS'])
 
 file_names=[]
-file_names.extend([r'slb_id169_R1-54#_R1s1-8_40nM_exp200_p038uW_T21_1_MMStack_Pos0.ome_locs_picked0503_tmobprops.hdf5'])
+file_names.extend([r'id169_B_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs_render_picked_tprops.hdf5'])
 
 ############################################################## Read in data
 #### Create list of paths
@@ -112,7 +112,7 @@ for l in labels:
     NgT,Ts=analyze.get_NgT(X.loc[(l,slice(None)),:])
     
     idx=['%s%i'%(field,T) for T in Ts]
-    y=NgT.loc[idx,'50%']
+    y=NgT.loc[idx,'mean']
     ax.plot(Ts*CycleTime,y,'-',lw=2,label=l)
     print('Rep%i, Tracks with T >= %.1f s have >= %.1f photons'%(l,Y.loc[l,'Tn=5e-01']*CycleTime,Y.loc[l,'Pn=5e-01']))
 
