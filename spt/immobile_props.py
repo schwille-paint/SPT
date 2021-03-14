@@ -262,8 +262,8 @@ def get_var(df):
     s_out['photons']=df['photons'].median()
     
     ### Set sx and sy to  maximum spread in x,y (locs!) instead of mean of sx,sy (PSF width)
-    s_out['sx']=np.percentile(df['x'],95)-np.percentile(df['x'],5)
-    s_out['sy']=np.percentile(df['y'],95)-np.percentile(df['y'],5)
+    s_out['sx']=np.percentile(df['x'],75)-np.percentile(df['x'],25)
+    s_out['sy']=np.percentile(df['y'],75)-np.percentile(df['y'],25)
     
     ### Add std_photons
     s_out['std_photons']=df['photons'].std()
