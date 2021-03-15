@@ -239,7 +239,7 @@ def get_trackmap(locs,fov,oversampling,field='assign_field'):
 def render_trackmap(flatyxf_u,image_shape):
     
     ## Prepare images for later assignment
-    map_n=np.zeros(image_shape).astype(np.float32) # Map for number of tracks within sub-pixel
+    map_n=np.zeros(image_shape).astype(np.float32)  # Map for number of tracks within sub-pixel
     map_f1=np.zeros(image_shape).astype(np.float32) # Map for first moment of attribute for tracks within sub-pixel
     map_f2=np.zeros(image_shape).astype(np.float32) # Map for second moment of attribute for tracks within sub-pixel
     

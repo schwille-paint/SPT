@@ -9,6 +9,7 @@
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 import trackpy as tp
 import os
@@ -41,6 +42,7 @@ def get_link(locs,search_range,memory):
                   link_strategy='hybrid',
                   )
     ### Sort and rename
+    print('Sorting by [group,frame] ... ')
     link.sort_values(by=['particle','frame'],ascending=True,inplace=True)
     link=link.rename(columns={'particle':'group'}) # Rename to groups for picasso compatibility
     
@@ -50,25 +52,21 @@ def get_link(locs,search_range,memory):
     return link
 
 #%%
-def drop_shorttracks(df,crit_len=10):
+def drop_shorttracks(df,min_n_locs=10):
     '''
-    Remove trajectories shorter than crit_len from output of get_link().
+    Remove trajectories with less localizations than min_n_locs from output of get_link().
     
     Args:
         df(pandas.DataFrame): Trajectories pandas.DataFrame, i.e. output of get_link() (see also trackpy.link())
-        crit_len(int=10):     Trajectories having less localizations than crit_len (frames) will be removed from df
+        min_n_locs(int=10):   Trajectories having less localizations than min_n_locs will be removed from df
     Returns:
-        pandas.DataFrame: ``df`` with short trajectories < crit_len removed.
+        pandas.DataFrame: ``df`` with short trajectories < min_n_locs removed.
     '''
-    ### Helper function to assign group length to all locs for later removal    
-    def get_len(df,crit_len):
-        s_out=pd.Series(np.ones(len(df))*len(df))
-        return s_out
     
-    ### Assign group length to locs
-    len_group=df.groupby('group').apply(lambda df: get_len(df,crit_len))
-    df_out=df.assign(n_locs=len_group.values)
-    df_out=df_out[df_out.n_locs>=crit_len]
+    print('Dropping short trajectories ...')
+    groups,group_locs = np.unique(df.group.values,return_counts=True)
+    in_groups = groups[group_locs >= min_n_locs]
+    df_out = df.query('group in @in_groups')
     
     return df_out
 
@@ -270,9 +268,9 @@ def main(locs,info,path,**params):
     #### Save complete link as _picked    
     info_picked=info.copy()+[params] 
     io.save_locs(path+'_picked%s%s.hdf5'%(sr,mr),
-                 link.to_records(index=False),
-                 info_picked,
-                 )
+                  link.to_records(index=False),
+                  info_picked,
+                  )
     
     ### Save reduced version (only first 500 groups!) of link for viewing in render
     try:
@@ -282,7 +280,8 @@ def main(locs,info,path,**params):
     link_view=link[link.group<=max_group]
     
     io.save_locs(path+'_picked%s%s'%(sr,mr)+'g500.hdf5', 
-                 link_view.to_records(index=False),
-                 info_picked,
-                 )
+                  link_view.to_records(index=False),
+                  info_picked,
+                  )
+    
     return [params,link]
