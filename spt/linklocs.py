@@ -138,9 +138,11 @@ def scan_sr_mem(locs,info,path,sr,mem,roi=True,timewindow=True):
         for m in mem:  
             #### Link localizations via trackpy
             link=get_link(locs,s,m) 
+            
             ### Assign
-            len_med=link.n_locs.median()
-            num_tracks=len(link.group.unique())
+            groups,group_locs = np.unique(link.group.values,return_counts=True)
+            len_med = np.median(group_locs)
+            num_tracks = len(groups)
             df_temp=pd.DataFrame({'len_med':len_med,
                                   'numtracks':num_tracks,
                                   'sr':s,

@@ -129,14 +129,13 @@ def assign_subgroup(df,subN):
     ### Create subgroup column
     k=int(N/subN) # Subgroups of length subN
     r=N%subN # Remainder subgroup
-    if k>0:
-        subgroups=np.hstack([np.ones(subN)*i] for i in range(k))
-        if r!=0: 
-            subgroups=np.hstack([subgroups,np.ones((1,r))*k]) # Assign last subgroup if there is a remainder
-    else: # Length of trajectory smaller than subN, assign remainder
-        subgroups=np.ones((1,r))*k
     
-    subgroups=subgroups.flatten().astype(np.int64)
+    if k>0:
+        subgroups = np.concatenate([np.ones(subN,dtype=np.uint16)*i for i in range(k)])
+        if r!=0: # Assign remainder subgroup
+            subgroups=np.concatenate([subgroups,np.ones(r,dtype=np.uint16)*k])
+    else: # Length of trajectory smaller than subN, assign remainder
+        subgroups=np.ones(r,dtype=np.uint16)*k
     
     ### Assign subgroups
     df_out=df.assign(subgroup=subgroups)
@@ -178,8 +177,10 @@ def split_trajectories(df,subN):
     ### Transform supgroup and subgroup into unique groupID
     i=subdf.loc[:,['supgroup','subgroup']].values
     value,count=np.unique(i,axis=0,return_counts=True)
+    
     groups=[[np.ones(count[j])*j] for j in range(len(count))]
     groups=np.concatenate(groups,axis=1).flatten().astype(np.int64)
+    
     subdf=subdf.assign(group=groups)
     
     return subdf
