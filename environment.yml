@@ -3,27 +3,29 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - colorama
   - numpy
-  - scikit-learn
-  - scipy
-  - numba
   - pandas
-  - python=3.7
-  - pip
-  - pyqt
-  - h5py
-  - jupyterlab
   - pytables
-  - tqdm=4.36.1
-  - spyder
-  - dask
+  - python=3.7
+  - scikit-learn
   - fastparquet
+  - trackpy
+  - h5py
   - pyyaml
-  - hdbscan
+  - pip
   - matplotlib
+  - scipy
+  - dask
+  - hdbscan
+  - tqdm
+  - pyqt
+  - numba
+  - spyder
+  - colorama
+  - jupyterlab
+  - snappy
   - trackpy
   - pip:
     - lmfit
-    - sphinx_rtd_theme
+    - sphinx-rtd-theme
 

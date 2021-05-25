@@ -47,7 +47,7 @@ def fit_tracks_per_frame(n_tracks):
 def get_mobile_props(df_in,infos,px,CycleTime,remove_immob=True):
     '''
     
-    ''' 
+    '''
     expID=df_in.index.levels[0].values
     
     df_list=[]
