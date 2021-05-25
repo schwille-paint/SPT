@@ -10,6 +10,9 @@
 SPT: Single particle tracking analysis
 ======================================
 
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.4792495.svg
+   :target: https://doi.org/10.5281/zenodo.4792495
+
 This package provides a complete single particle tracking analysis workflow based on `picasso_addon`_, `picasso`_ and `trackpy`_ python packages including:
 
 - Localization of raw movies based on `picasso_addon`_ (auto net-gradient) and `picasso.localize`_
