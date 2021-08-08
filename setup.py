@@ -13,8 +13,8 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Operating System :: OS Independent",
    ],
-   install_requires=[
-		"picasso @ git+https://github.com/jungmannlab/picasso.git#egg=picasso-0.3.1",
-		"picasso_addon @ git+https://github.com/schwille-paint/picasso_addon.git#egg=picasso_addon-0.1.1",
+   dependency_links=[
+		"https://github.com/jungmannlab/picasso/tarball/master",
+		"https://github.com/schwille-paint/picasso_addon/tarball/master",
    ], 
 )

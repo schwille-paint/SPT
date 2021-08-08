@@ -17,8 +17,8 @@ file_names=[]
 # file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs.hdf5'])
 
 ### Jan's file
-dir_names.extend(['/fs/pool/pool-schwille-spt/P1_origamiXlink_SPT/Data/21-03-12_id208_id219_T23/id208+id219_R16ntCy3B_312.5pm_P13A488_20nM_p1000uW_488nm_2/21-03-15_FS_test'])
-file_names.extend(['id208+id219_R16ntCy3B_312.5pm_P13A488_20nM_p1000uW_488nm_2_MMStack_Pos0.ome_locs.hdf5'])
+dir_names.extend([r'C:\Data\p06.SP-tracking\20-01-17_th_slb_L_T21\slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1'])
+file_names.extend(['slb_id169_R1-54#_R1s1-8_40nM_exp200_p114uW_T21_1_MMStack_Pos0.ome_locs.hdf5'])
 
 #%%
 ######################################## Read in single data set
