@@ -15,3 +15,4 @@ PyQt5=5.9.2
 hdbscan=0.8.27
 dask[complete]
 trackpy==0.5.0
+importlib_metadata
